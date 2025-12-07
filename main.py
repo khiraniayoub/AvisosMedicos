@@ -2,6 +2,10 @@ import sys
 import csv
 import os
 import shutil
+import json
+import requests
+from pathlib import Path
+from io import BytesIO
 import pandas as pd
 from PyQt6.QtCore import QDate, QTime, Qt, pyqtSignal, QPropertyAnimation, QEasingCurve, QAbstractAnimation, QPoint, QRect
 from PyQt6.QtGui import QColor, QPixmap, QCursor
@@ -10,14 +14,13 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QSpinBox, QTextEdit, QCheckBox, QPushButton, QLabel, 
                              QScrollArea, QMessageBox, QTabWidget, QTableWidget, 
                              QTableWidgetItem, QHeaderView, QFrame, QMenu, QGridLayout,
-                             QFileDialog, QGraphicsDropShadowEffect)
+                             QFileDialog, QGraphicsDropShadowEffect, QDialog)
 
 import webbrowser
 from urllib.parse import quote
 import math
-import json
-import requests
-from pathlib import Path
+
+# (Removed image generation - schematic summaries are HTML-based)
 
 class ClickableLabel(QLabel):
     clicked = pyqtSignal()
@@ -482,6 +485,62 @@ def geocode_hotel(hotel_name: str):
     except Exception:
         return None
     return None
+
+
+def create_schematic_html(data: dict) -> str:
+    """Return a concise schematic HTML showing only the requested fields.
+
+    Fields shown: Fecha, Emisor, Estado, Paciente, Nacionalidad, Edad,
+    Pagador (y Seguro), Touroperador, Hora Aviso, Medico, Diagnostico,
+    Traslado (highlighted) and Ingreso (highlighted if present).
+    """
+    # Pull fields with safe defaults
+    fecha = data.get("Fecha", "-")
+    emisor = data.get("Emisor", "-")
+    estado = (data.get("Estado", "") or "Pendiente")
+    paciente = data.get("Paciente", "(sin nombre)")
+    nacionalidad = data.get("Nacionalidad", "-")
+    edad = data.get("Edad", "-")
+    pagador = data.get("Pagador", "-")
+    seguro = data.get("Seguro", "-")
+    touroperador = data.get("Touroperador", "-")
+    hora_aviso = data.get("Hora Aviso", data.get("Hora Avisos", "-"))
+    medico = data.get("Medico", "-")
+    diagnostico = data.get("Diagnostico", "-")
+    nhc = data.get("Historia Medica", data.get("NHC", "-"))
+    traslado = (data.get("Traslado", "No") or "No")
+    ingreso = (data.get("Ingreso", "No") or "No")
+
+    # Colors
+    estado_color = "#00cc66" if estado.lower() == "cerrado" else ("#ff4444" if estado.lower() == "abierto" else "#cccccc")
+    traslado_color = "#ffcc00" if traslado.lower() in ("si", "sí", "yes", "true") else "#555555"
+    ingreso_color = "#ff66cc" if str(ingreso).strip().lower() in ("si", "sí", "yes", "true") else "#555555"
+
+    html = [
+        "<div style='font-family:Segoe UI, Roboto, sans-serif; font-size:15px; color:#e6e6e6;'>",
+        # Header row with fecha/emisor/estado
+        "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px'>",
+        f"<div style='font-weight:700;font-size:18px'>{fecha} — {emisor}</div>",
+        f"<div style='background:{estado_color};color:#000;padding:6px 10px;border-radius:8px;font-weight:700'>{estado}</div>",
+        "</div>",
+
+        # Main facts grid (two columns)
+        "<table style='width:100%;border-collapse:collapse;margin-top:6px'>",
+        "<tr>",
+        f"<td style='vertical-align:top;padding:8px;width:50%'><b>Paciente:</b> {paciente}<br/><b>NHC:</b> {nhc}<br/><b>Nacionalidad:</b> {nacionalidad}<br/><b>Edad:</b> {edad}<br/><b>Pagador:</b> {pagador} <small style='color:#aaa'>({seguro})</small></td>",
+        f"<td style='vertical-align:top;padding:8px;width:50%'><b>TTOO:</b> {touroperador}<br/><b>Hora Aviso:</b> {hora_aviso}<br/><b>Médico:</b> {medico}<br/><b>Diagnóstico:</b> {diagnostico}</td>",
+        "</tr>",
+        "</table>",
+
+        # Highlight Traslado and Ingreso as badges
+        "<div style='margin-top:12px;display:flex;gap:12px'>",
+        f"<div style='background:{traslado_color};color:#000;padding:8px 12px;border-radius:8px;font-weight:700'>Traslado: {traslado}</div>",
+        f"<div style='background:{ingreso_color};color:#000;padding:8px 12px;border-radius:8px;font-weight:700'>Ingreso: {ingreso}</div>",
+        "</div>",
+
+        "</div>",
+    ]
+    return '\n'.join(html)
 
 class AvisoManager:
     FILE_NAME = "avisos.csv"
@@ -975,21 +1034,21 @@ class AvisoForm(QWidget):
         self.hotel_cb.setEditable(True)
         # Populate hotels
         self._reload_hotels()
-        # Make room for a DISTANCIA field next to the hotel (hotel spans 3 cols)
-        self.grid.addWidget(self.hotel_cb, 2, 1, 1, 3)
+        # Place HOTEL and HABITACIÓN adjacent: hotel spans 2 cols, habitacion next to it
+        self.grid.addWidget(self.hotel_cb, 2, 1, 1, 2)
 
-        # DISTANCIA field: read-only, auto-calculated (km)
-        self.grid.addWidget(QLabel("DISTANCIA (km):"), 2, 4, alignment=Qt.AlignmentFlag.AlignRight)
+        # HABITACIÓN: placed immediately to the right of HOTEL
+        self.grid.addWidget(QLabel("HABITACIÓN:"), 2, 3, alignment=Qt.AlignmentFlag.AlignRight)
+        self.habitacion_edit = QLineEdit()
+        self.habitacion_edit.setMaximumWidth(100)
+        self.grid.addWidget(self.habitacion_edit, 2, 4)
+
+        # DISTANCIA field: read-only, auto-calculated (km) -- moved slightly right
+        self.grid.addWidget(QLabel("DISTANCIA (km):"), 2, 5, alignment=Qt.AlignmentFlag.AlignRight)
         self.distancia_edit = QLineEdit()
         self.distancia_edit.setReadOnly(True)
         self.distancia_edit.setMaximumWidth(100)
-        self.grid.addWidget(self.distancia_edit, 2, 5)
-
-        # Move HABITACIÓN further right to keep layout tidy
-        self.grid.addWidget(QLabel("HABITACIÓN:"), 2, 6, alignment=Qt.AlignmentFlag.AlignRight)
-        self.habitacion_edit = QLineEdit()
-        self.habitacion_edit.setMaximumWidth(100)
-        self.grid.addWidget(self.habitacion_edit, 2, 7)
+        self.grid.addWidget(self.distancia_edit, 2, 6)
 
         # Recompute distancia when hotel selection changes
         self.hotel_cb.currentTextChanged.connect(self.update_distancia)
@@ -1601,7 +1660,23 @@ class AvisosList(QWidget):
         self.export_btn.clicked.connect(self.export_data)
         btn_layout.addWidget(self.export_btn)
         
+        # Summary button to view selected aviso
+        self.summary_btn = QPushButton("👁️ VER RESUMEN")
+        self.summary_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.summary_btn.setStyleSheet(btn_style + """
+            QPushButton { background-color: #222; border: 2px solid #00f3ff; color: #00f3ff; }
+            QPushButton:hover { background-color: #00f3ff; color: black; }
+        """)
+        self.summary_btn.clicked.connect(self.on_summary_button)
+        btn_layout.addWidget(self.summary_btn)
+        # Disabled until a row is selected
+        self.summary_btn.setEnabled(False)
+        
         layout.addLayout(btn_layout)
+
+        # Enable summary button when selection changes
+        sel_model = self.table.selectionModel()
+        sel_model.selectionChanged.connect(lambda sel, des: self._update_summary_button_state())
 
         self.current_data_map = {}
 
@@ -1660,6 +1735,7 @@ class AvisosList(QWidget):
             QMenu { background-color: #1a1a25; border: 1px solid #00f3ff; color: white; }
             QMenu::item:selected { background-color: #00f3ff; color: black; }
         """)
+        summary_action = menu.addAction("Ver Resumen")
         edit_action = menu.addAction("Editar Aviso")
         del_action = menu.addAction("Eliminar Aviso")
         
@@ -1668,7 +1744,19 @@ class AvisosList(QWidget):
         row = self.table.currentRow()
         if row < 0: return
 
-        if action == edit_action:
+        if action == summary_action:
+            original_idx = self.current_data_map.get(row)
+            if original_idx is None:
+                return
+            all_data = AvisoManager.load_avisos()
+            if not (0 <= original_idx < len(all_data)):
+                return
+            data = all_data[original_idx]
+            dialog = AvisoSummaryDialog(data, original_idx, parent=self)
+            dialog.exec()
+            if dialog.changed:
+                self.load_data()
+        elif action == edit_action:
             self.on_double_click(row, 0)
         elif action == del_action:
             self.delete_row(row)
@@ -1680,6 +1768,8 @@ class AvisosList(QWidget):
         all_data = AvisoManager.load_avisos()
         if 0 <= original_idx < len(all_data):
             self.request_edit.emit(original_idx, all_data[original_idx])
+
+    
 
     def delete_row(self, row):
         original_idx = self.current_data_map.get(row)
@@ -1694,6 +1784,138 @@ class AvisosList(QWidget):
                 self.load_data()
             else:
                 QMessageBox.warning(self, "Error", msg)
+
+    def _update_summary_button_state(self):
+        row = self.table.currentRow()
+        self.summary_btn.setEnabled(row >= 0)
+
+    def on_summary_button(self):
+        row = self.table.currentRow()
+        if row < 0:
+            return
+        original_idx = self.current_data_map.get(row)
+        if original_idx is None:
+            return
+        all_data = AvisoManager.load_avisos()
+        if not (0 <= original_idx < len(all_data)):
+            return
+        data = all_data[original_idx]
+        dialog = AvisoSummaryDialog(data, original_idx, parent=self)
+        dialog.exec()
+        if dialog.changed:
+            self.load_data()
+
+
+class AvisoSummaryDialog(QDialog):
+    """Dialog showing a detailed summary of an aviso with option to 'Cerrar Aviso'."""
+    def __init__(self, data: dict, index: int, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Resumen del Aviso")
+        self.setModal(True)
+        # Resize dialog to use most of available screen so content fits without scrolling
+        try:
+            screen = QApplication.primaryScreen().availableGeometry()
+            w = int(screen.width() * 0.9)
+            h = int(screen.height() * 0.85)
+            self.resize(w, h)
+        except Exception:
+            self.resize(900, 600)
+        self.changed = False
+        self.data = dict(data)
+        self.index = index
+
+        layout = QVBoxLayout(self)
+
+        title = QLabel(f"Resumen - {self.data.get('Paciente','(Sin nombre)')}")
+        title.setStyleSheet('font-size:16px; font-weight:bold;')
+        layout.addWidget(title)
+
+        # Build schematic HTML summary for quick understanding
+        schematic_html = create_schematic_html(self.data)
+        # also append a full field listing below
+        fields_html = ['<div style="font-family:Segoe UI, Roboto, sans-serif; font-size:12px;margin-top:8px">']
+        for field in AvisoManager.FIELDS:
+            val = self.data.get(field, "")
+            fields_html.append(f"<p style='margin:3px 0'><b>{field}:</b> {val}</p>")
+        fields_html.append('</div>')
+
+        summary = QTextEdit()
+        summary.setReadOnly(True)
+        # Observations should be highlighted in a different color inside the HTML
+        # Build HTML with observation styled
+        observ_html = f"<div style='background:#1a1a1a;color:#ffdca3;padding:8px;border-radius:6px;margin-top:8px'><b>Observaciones:</b> {self.data.get('Observaciones','-')}</div>"
+        full_html = schematic_html + '\n' + '\n'.join(fields_html) + '\n' + observ_html
+        summary.setHtml(full_html)
+
+        # Try to avoid scrollbars by allocating most of the dialog height to the summary area
+        try:
+            avail_h = self.height() - 140
+            if avail_h < 200:
+                avail_h = 200
+            summary.setMinimumHeight(avail_h)
+            summary.setMaximumHeight(avail_h)
+            summary.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            summary.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        except Exception:
+            pass
+
+        layout.addWidget(summary)
+
+        btns = QHBoxLayout()
+        btns.addStretch()
+
+        self.close_aviso_btn = QPushButton("Cerrar Aviso")
+        self.close_aviso_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.close_aviso_btn.clicked.connect(self.on_close_aviso)
+        if self.data.get("Estado", "") == "Cerrado":
+            self.close_aviso_btn.setEnabled(False)
+        btns.addWidget(self.close_aviso_btn)
+
+        self.edit_btn = QPushButton("Editar")
+        self.edit_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.edit_btn.clicked.connect(self.on_edit_aviso)
+        btns.addWidget(self.edit_btn)
+
+        self.close_btn = QPushButton("Cerrar")
+        self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.close_btn.clicked.connect(self.accept)
+        btns.addWidget(self.close_btn)
+
+        layout.addLayout(btns)
+
+    def on_close_aviso(self):
+        # Mark as closed and persist
+        self.data["Estado"] = "Cerrado"
+        success, msg = AvisoManager.update_aviso(self.index, self.data)
+        if success:
+            QMessageBox.information(self, "Aviso cerrado", "El aviso se ha marcado como CERRADO.")
+            self.changed = True
+            self.accept()
+        else:
+            QMessageBox.warning(self, "Error", f"No se pudo cerrar el aviso:\n{msg}")
+
+    def on_edit_aviso(self):
+        # Try to ask parent/list to open the editor
+        parent = self.parent()
+        try:
+            if hasattr(parent, 'request_edit'):
+                parent.request_edit.emit(self.index, self.data)
+                self.accept()
+                return
+        except Exception:
+            pass
+
+        # Fallback: try to call go_to_edit on top-level window
+        try:
+            top = self.window()
+            if hasattr(top, 'go_to_edit'):
+                top.go_to_edit(self.index, self.data)
+                self.accept()
+                return
+        except Exception:
+            pass
+
+        QMessageBox.warning(self, "Editar no disponible", "No se pudo iniciar la edición desde aquí.")
 
 
 class ModernMedicalApp(QMainWindow):
