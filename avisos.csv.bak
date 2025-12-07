@@ -1,0 +1,15 @@
+Emisor,Hora Solicitud,Fecha,Hotel,Habitacion,Estado,Paciente,Edad,Historia Medica,Nacionalidad,Motivo Urgencia,Pagador,Seguro,Touroperador,Hora Aviso,Hora Finalización,Medico,Diagnostico,Traslado,Tipo Traslado,Hora Ambulancia,Ingreso,Medico Ingreso,Observaciones
+Jaime,10:39,2025-12-06,fdfkdlfkdl,,Cerrado,sddsdsd,0,,,,Paciente,,,,,,,No,,,No ingresa,,
+Paciente,10:39,2025-12-07,,,Cerrado,,0,,,,Paciente,,,,,,,Si,Ambulancia,11:01,Planta,,
+Jaime,10:39,2025-12-06,,,Cerrado,,0,,,,Paciente,,,,,,,No,,,No ingresa,,
+Jaime,15:55,2025-12-06,Hotel Claude (Marbella),,Cerrado,,0,,Español/a,,Paciente,,TUI,,,Dr. Juan Pérez,,No,,,No ingresa,Dr. Antonio García,
+Guia,16:51,2025-12-06,Gran Hotel Miramar GL (Malaga),,Anulado,,0,,Español/a,dolor de estomago ,Paciente,,TUI,,,dr. fidalgo,,No,,,No ingresa,,
+RECEPCION,20:02,2025-12-06,Amanhavis Hotel (Benahavis),,Cerrado,ayoub khirani,3,,Español/a,cualquier cosa,Seguro,Falck TravelCare,TUI,,,Dr. Louis Pasteur,GEA,Si,Ambulancia,22:22,UCI,Dr. Galen,ESO ES UA PRUEBA
+Jaime,20:30,2025-12-06,Amanhavis Hotel (Benahavis),,Anulado,DSDSDSDSDSD,0,DSSDS,Español/a,DSDDSDSDSD,Paciente,Falck TravelCare,TUI,,,,,No,,,No ingresa,,
+Jaime,20:39,2025-12-05,Hotel Claude (Marbella),,Abierto,,0,,Español/a,,Paciente,Falck TravelCare,TUI,,,,,No,,,No ingresa,,
+Jaime,20:59,2025-12-06,Amanhavis Hotel (Benahavis),,Anulado,DFDFDFD,0,,Español/a,,Paciente,Falck TravelCare,TUI,,,,,No,,,No ingresa,,
+Jaime,21:03,2025-12-06,Amanhavis Hotel (Benahavis),,Anulado,sdsds,0,,Español/a,,Paciente,Falck TravelCare,TUI,,,,,No,,,No ingresa,,
+Seguro,22:46,2025-12-17,Amanhavis Hotel (Benahavis),,Abierto,FDFDFDF,0,,Español/a,,Seguro,Bupa Global,Alltours,,,Dr. Elizabeth Blackwell,GEA,Si,Ambulancias Andalucia,22:46,Planta,Dr. Edward Jenner,
+SMCS,22:54,2025-12-06,Amanhavis Hotel (Benahavis),,Cerrado,EDUARDO MORENO,0,,Español/a,GEA,Seguro,Falck TravelCare,TUI,,,Dr. Elizabeth Blackwell,,Si,Ambulancias AGP,22:54,Planta,Dr. Jonas Salk,SE VA DE ALTA
+Jaime,11:06,2025-12-20,El Fuerte Marbella,,Abierto,sds-d-f.-d,0,,Español/a,dolor de estomago ,Hotel,,FTI Touristik,,,Dr. Elizabeth Blackwell,,Si,Helicopteros Sanitarios,11:06,No ingresa,Dr. RANIA,
+Jaime,11:09,2025-12-07,Catalonia Málaga,,Abierto,dfdfdfdfdfd,0,,Español/a,,Paciente,Falck TravelCare,TUI,,,,,No,,,No ingresa,,
