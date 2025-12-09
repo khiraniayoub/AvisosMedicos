@@ -30,5 +30,49 @@
   "El Fuerte Marbella": {
     "lat": 36.5081471,
     "lon": -4.8839591
+  },
+  "Don Carlos Marbella": {
+    "lat": 36.4926867,
+    "lon": -4.7736249
+  },
+  "Hotel Puente Romano (Marbella)": {
+    "lat": 36.5036637,
+    "lon": -4.9255823
+  },
+  "Casa la Concha (Marbella)": {
+    "lat": 36.5208186,
+    "lon": -4.8865194
+  },
+  "H10 Croma Málaga": {
+    "lat": 36.718015,
+    "lon": -4.4253077
+  },
+  "Only YOU Hotel Málaga": {
+    "lat": 36.7176684,
+    "lon": -4.4210419
+  },
+  "VITHAS BENALMADENA": {
+    "lat": 36.5981084,
+    "lon": -4.5583942
+  },
+  "Melia Costa Del Sol": {
+    "lat": 36.6209068,
+    "lon": -4.4963563
+  },
+  "Hotel ILUNION Malaga": {
+    "lat": 36.7105546,
+    "lon": -4.4273237
+  },
+  "Hotel Don Curro (Malaga)": {
+    "lat": 36.7190207,
+    "lon": -4.4208422
+  },
+  "Hotel El Puerto by Pierre & Vacances": {
+    "lat": 36.5393578,
+    "lon": -4.620736
+  },
+  "Casa Consistorial (Fuengirola)": {
+    "lat": 36.5385224,
+    "lon": -4.6257856
   }
 }
