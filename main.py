@@ -15,7 +15,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QSpinBox, QTextEdit, QCheckBox, QPushButton, QLabel, 
                              QScrollArea, QMessageBox, QTabWidget, QTableWidget, 
                              QTableWidgetItem, QHeaderView, QFrame, QMenu, QGridLayout,
-                             QFileDialog, QGraphicsDropShadowEffect, QDialog)
+                             QFileDialog, QGraphicsDropShadowEffect, QDialog, QListWidget)
 
 import webbrowser
 from urllib.parse import quote
@@ -39,6 +39,13 @@ try:
 except ImportError:
     WEBENGINE_AVAILABLE = False
     QWebEngineView = None
+
+# Import database connection
+try:
+    from src.database import db
+except ImportError:
+    db = None
+    print("Database module not found or failed to import.")
 
 # (Removed image generation - schematic summaries are HTML-based)
 
@@ -468,6 +475,294 @@ def get_light_stylesheet():
     """
 
 
+
+class LoginDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Vithas - Iniciar Sesión")
+        self.setFixedSize(450, 600)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        
+        # Main Layout
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        
+        # Container Frame with NEON effect
+        self.frame = QFrame(self)
+        self.frame.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                    stop:0 #0a0a0f, stop:1 #050505);
+                border-radius: 16px;
+                border: 2px solid #0055a4;
+            }
+        """)
+        
+        # Enhanced Neon Glow Shadow Effect
+        shadow = QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(40)
+        shadow.setXOffset(0)
+        shadow.setYOffset(0)
+        shadow.setColor(QColor(0, 85, 164, 180))  # Vithas blue glow
+        self.frame.setGraphicsEffect(shadow)
+        
+        # Close Button with neon style
+        self.close_btn = QPushButton("✕", self)
+        self.close_btn.setFixedSize(35, 35)
+        self.close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.close_btn.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                color: #0055a4;
+                font-size: 18px;
+                font-weight: bold;
+                border: 2px solid #0055a4;
+                border-radius: 17px;
+            }
+            QPushButton:hover {
+                color: #ff0055;
+                border-color: #ff0055;
+                background-color: rgba(255, 0, 85, 0.1);
+            }
+        """)
+        self.close_btn.clicked.connect(self.reject)
+        self.close_btn.move(400, 15)
+        self.close_btn.raise_()
+        
+        layout.addWidget(self.frame)
+        
+        # Content Layout
+        content_layout = QVBoxLayout(self.frame)
+        content_layout.setContentsMargins(45, 55, 45, 55)
+        content_layout.setSpacing(25)
+        
+        # 1. Logo with neon glow
+        logo_label = QLabel()
+        logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        logo_label.setStyleSheet("border: none; background: transparent;")
+        
+        if os.path.exists("logo.png") or os.path.exists("vithas_bg.png"):
+             p_path = "logo.png" if os.path.exists("logo.png") else "vithas_bg.png"
+             pixmap = QPixmap(p_path)
+             if not pixmap.isNull():
+                 pixmap = pixmap.scaled(240, 110, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                 logo_label.setPixmap(pixmap)
+             else:
+                 logo_label.setText("VITHAS")
+                 logo_label.setStyleSheet("""
+                     color: #0055a4; 
+                     font-size: 42px; 
+                     font-weight: bold; 
+                     border: none; 
+                     font-family: 'Segoe UI', sans-serif;
+                     text-shadow: 0 0 20px #0055a4, 0 0 40px #0055a4;
+                 """)
+        else:
+            logo_label.setText("VITHAS")
+            logo_label.setStyleSheet("""
+                color: #0055a4; 
+                font-size: 42px; 
+                font-weight: bold; 
+                border: none; 
+                font-family: 'Segoe UI', sans-serif;
+            """)
+            
+        content_layout.addWidget(logo_label)
+        content_layout.addSpacing(35)
+        
+        # Neon input style
+        input_style = """
+            QLineEdit {
+                border: 2px solid #333;
+                background-color: #101014;
+                color: #ffffff;
+                padding: 14px;
+                font-size: 15px;
+                border-radius: 8px;
+            }
+            QLineEdit:focus {
+                border: 2px solid #0055a4;
+                background-color: #1a1a25;
+            }
+        """
+        
+        # 2. User Input
+        self.user_edit = QLineEdit()
+        self.user_edit.setPlaceholderText("Usuario")
+        self.user_edit.setStyleSheet(input_style)
+        content_layout.addWidget(self.user_edit)
+        
+        # 3. Password Input Frame
+        pwd_frame = QFrame()
+        pwd_frame.setStyleSheet("""
+            QFrame {
+                background-color: #101014;
+                border: 2px solid #333;
+                border-radius: 8px;
+            }
+        """)
+        pf_layout = QHBoxLayout(pwd_frame)
+        pf_layout.setContentsMargins(0,0,5,0)
+        pf_layout.setSpacing(0)
+        
+        self.pwd_edit_inner = QLineEdit()
+        self.pwd_edit_inner.setPlaceholderText("Contraseña")
+        self.pwd_edit_inner.setEchoMode(QLineEdit.EchoMode.Password)
+        self.pwd_edit_inner.setStyleSheet("""
+            QLineEdit {
+                border: none;
+                background: transparent;
+                color: #ffffff;
+                padding: 14px;
+                font-size: 15px;
+            }
+        """)
+        
+        # Add focus effect to password frame
+        self.pwd_edit_inner.focusInEvent = lambda e: (
+            pwd_frame.setStyleSheet("""
+                QFrame {
+                    background-color: #1a1a25;
+                    border: 2px solid #0055a4;
+                    border-radius: 8px;
+                }
+            """),
+            QLineEdit.focusInEvent(self.pwd_edit_inner, e)
+        )
+        self.pwd_edit_inner.focusOutEvent = lambda e: (
+            pwd_frame.setStyleSheet("""
+                QFrame {
+                    background-color: #101014;
+                    border: 2px solid #333;
+                    border-radius: 8px;
+                }
+            """),
+            QLineEdit.focusOutEvent(self.pwd_edit_inner, e)
+        )
+        
+        self.eye_btn_inner = QPushButton("👁️")
+        self.eye_btn_inner.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.eye_btn_inner.setFixedSize(35,35)
+        self.eye_btn_inner.setStyleSheet("""
+            QPushButton {
+                background: transparent; 
+                border: none; 
+                font-size: 18px; 
+                color: #0055a4;
+            }
+            QPushButton:hover { 
+                color: #ffffff;
+                background-color: rgba(0, 85, 164, 0.1);
+                border-radius: 4px;
+            }
+        """)
+        self.eye_btn_inner.clicked.connect(self.toggle_password)
+        
+        pf_layout.addWidget(self.pwd_edit_inner)
+        pf_layout.addWidget(self.eye_btn_inner)
+        
+        content_layout.addWidget(pwd_frame)
+        
+        # 4. Remember Checkbox with neon style
+        chk_layout = QHBoxLayout()
+        self.chk_remember = QCheckBox("Recordar la contraseña")
+        self.chk_remember.setStyleSheet("""
+            QCheckBox {
+                color: #0055a4;
+                font-size: 14px;
+                spacing: 8px;
+                background: transparent;
+                border: none;
+            }
+            QCheckBox::indicator {
+                width: 20px;
+                height: 20px;
+                background: #101014;
+                border: 2px solid #333;
+                border-radius: 4px;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #0055a4;
+                border: 2px solid #0055a4;
+            }
+            QCheckBox::indicator:hover {
+                border-color: #0055a4;
+            }
+        """)
+        chk_layout.addSpacing(5)
+        chk_layout.addWidget(self.chk_remember)
+        chk_layout.addStretch()
+        content_layout.addLayout(chk_layout)
+        
+        content_layout.addSpacing(25)
+        
+        # 5. Login Button with neon effect
+        self.login_btn = QPushButton("INICIAR SESIÓN")
+        self.login_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.login_btn.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #0055a4, stop:1 #003d7a);
+                color: #ffffff;
+                font-weight: bold;
+                padding: 16px;
+                border-radius: 8px;
+                font-size: 16px;
+                border: none;
+                text-transform: uppercase;
+            }
+            QPushButton:hover { 
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #0066c7, stop:1 #004488);
+            }
+            QPushButton:pressed { 
+                background-color: #003366;
+            }
+        """)
+        self.login_btn.clicked.connect(self.do_login)
+        content_layout.addWidget(self.login_btn)
+        
+        content_layout.addSpacing(20)
+        
+        # 6. Forgot Password with neon hover
+        self.forgot_lbl = QLabel("¿Ha olvidado la contraseña?")
+        self.forgot_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.forgot_lbl.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.forgot_lbl.setStyleSheet("""
+            QLabel {
+                color: #888; 
+                font-size: 13px; 
+                background: transparent;
+                border: none;
+            }
+            QLabel:hover { 
+                color: #0055a4;
+            }
+        """)
+        content_layout.addWidget(self.forgot_lbl)
+        
+        content_layout.addStretch()
+
+    def toggle_password(self):
+        if self.pwd_edit_inner.echoMode() == QLineEdit.EchoMode.Password:
+            self.pwd_edit_inner.setEchoMode(QLineEdit.EchoMode.Normal)
+            # self.eye_btn_inner.setText("🔒") 
+        else:
+            self.pwd_edit_inner.setEchoMode(QLineEdit.EchoMode.Password)
+            # self.eye_btn_inner.setText("👁️")
+
+    def do_login(self):
+        user = self.user_edit.text().strip()
+        pwd = self.pwd_edit_inner.text().strip()
+        
+        # Validate credentials
+        if user == "IISS" and pwd == "IISS2025":
+            self.accept()
+        else:
+            QMessageBox.warning(self, "Error de Acceso", "Usuario o contraseña incorrectos.\n\nPor favor, inténtelo de nuevo.")
+
 class HotelLocationManager:
     """Helper to detect Municipio and Zona based on Hotel name."""
     
@@ -801,9 +1096,60 @@ class AvisoManager:
         "Seguro", "Touroperador", "Hora Aviso", "Hora Finalización", "Medico", "Diagnostico", "Traslado", 
         "Tipo Traslado", "Hora Ambulancia", "Ingreso", "Medico Ingreso", "Observaciones"
     ]
+    
+    # Mapping between DB columns (lowercase) and App Keys (Title Case)
+    DB_MAP = {
+        'emisor': 'Emisor',
+        'hora_solicitud': 'Hora Solicitud',
+        'fecha': 'Fecha',
+        'hotel': 'Hotel',
+        'habitacion': 'Habitacion',
+        'estado': 'Estado',
+        'paciente': 'Paciente',
+        'edad': 'Edad',
+        'historia_medica': 'Historia Medica',
+        'nacionalidad': 'Nacionalidad',
+        'motivo_urgencia': 'Motivo Urgencia',
+        'pagador': 'Pagador',
+        'seguro': 'Seguro',
+        'touroperador': 'Touroperador',
+        'hora_aviso': 'Hora Aviso',
+        'hora_finalizacion': 'Hora Finalización',
+        'medico': 'Medico',
+        'diagnostico': 'Diagnostico',
+        'traslado': 'Traslado',
+        'tipo_traslado': 'Tipo Traslado',
+        'hora_ambulancia': 'Hora Ambulancia',
+        'ingreso': 'Ingreso',
+        'medico_ingreso': 'Medico Ingreso',
+        'observaciones': 'Observaciones'
+    }
+    # Reverse map for saving
+    APP_MAP = {v: k for k, v in DB_MAP.items()}
 
     @classmethod
     def load_avisos(cls):
+        # Try Loading from DB
+        if db and db.connect():
+            try:
+                rows = db.execute_query("SELECT * FROM avisos ORDER BY id ASC")
+                if rows is not None:
+                    data = []
+                    for r in rows:
+                        item = {}
+                        # Map DB columns to App keys
+                        for db_col, app_key in cls.DB_MAP.items():
+                            item[app_key] = r.get(db_col, "")
+                        
+                        # Preserve ID and other metadata
+                        item['_id'] = r['id'] 
+                        item['created_at'] = r.get('created_at')
+                        data.append(item)
+                    return data
+            except Exception as e:
+                print(f"DB Load Error: {e}")
+        
+        # Fallback to CSV if DB fails or not configured
         if not os.path.isfile(cls.FILE_NAME):
             return []
         try:
@@ -811,7 +1157,7 @@ class AvisoManager:
                 reader = csv.DictReader(file)
                 data = list(reader)
                 for idx, row in enumerate(data):
-                    row['_id'] = idx 
+                    row['_id'] = idx # usage of list index as ID for CSV
                 return data
         except Exception as e:
             print(f"Error loading CSV: {e}")
@@ -819,50 +1165,147 @@ class AvisoManager:
 
     @classmethod
     def save_all(cls, avisos_list):
-        try:
-            if os.path.exists(cls.FILE_NAME):
-                shutil.copy(cls.FILE_NAME, cls.FILE_NAME + ".bak")
-            
-            with open(cls.FILE_NAME, mode="w", newline="", encoding="utf-8") as file:
-                writer = csv.DictWriter(file, fieldnames=cls.FIELDS)
-                writer.writeheader()
-                for aviso in avisos_list:
-                    cleaned = {k: v for k, v in aviso.items() if k in cls.FIELDS}
-                    writer.writerow(cleaned)
-            return True, "Datos guardados correctamente."
-        except Exception as e:
-            return False, str(e)
+        # This function was used for CSV full overwrite.
+        # With DB, we don't save_all usually, but we keep it for CSV fallback 
+        # or if the app logic strongly relies on modifying the list and saving it.
+        # Ideally, we should refactor create/update to not use save_all.
+        pass
 
     @classmethod
     def create_aviso(cls, data):
-        avisos = cls.load_avisos()
-        avisos.append(data)
-        return cls.save_all(avisos)
+        if db and db.connect():
+            cols = []
+            vals = []
+            params = []
+            for app_key, val in data.items():
+                if app_key in cls.APP_MAP:
+                    cols.append(cls.APP_MAP[app_key])
+                    vals.append("%s")
+                    params.append(str(val)) # Ensure string?
+            
+            if cols:
+                query = f"INSERT INTO avisos ({','.join(cols)}) VALUES ({','.join(vals)})"
+                res = db.execute_query(query, tuple(params))
+                # For INSERT, execute_query returns rowcount (or fetchall if verifying). 
+                # Ideally execute_query should handle commit. My implementation does autocommit.
+                return True, "Guardado en BD."
+            return False, "Datos vacíos."
+        else:
+            # CSV Fallback
+            avisos = cls.load_avisos() # Warning: this might load from DB if DB worked earlier but failed now?
+            # If DB is down, load_avisos falls back to CSV field.
+            # But mixing them is dangerous.
+            # Simple approach: If db is None, use CSV.
+            return cls._save_to_csv_append(data)
 
     @classmethod
     def update_aviso(cls, index, data):
-        avisos = cls.load_avisos()
-        if 0 <= index < len(avisos):
-            avisos[index] = data
-            return cls.save_all(avisos)
+        # Index here is the list index from the UI table.
+        # We need the real ID.
+        # The 'data' dict usually comes from the UI forms and might NOT have _id.
+        # But we need to know WHICH record to update.
+        # Strategy: Reload the list (same order as UI), find the record at index, get its ID.
+        
+        current_list = cls.load_avisos()
+        if 0 <= index < len(current_list):
+            target = current_list[index]
+            real_id = target.get('_id')
+            
+            if db and db.connect() and isinstance(real_id, int):
+                # Update DB
+                set_clauses = []
+                params = []
+                for app_key, val in data.items():
+                    if app_key in cls.APP_MAP:
+                        set_clauses.append(f"{cls.APP_MAP[app_key]} = %s")
+                        params.append(str(val))
+                
+                if set_clauses:
+                    params.append(real_id)
+                    query = f"UPDATE avisos SET {', '.join(set_clauses)} WHERE id = %s"
+                    db.execute_query(query, tuple(params))
+                    return True, "Actualizado en BD."
+                return False, "Sin cambios."
+            else:
+                # CSV Fallback
+                return cls._save_to_csv_update(index, data)
         return False, "Índice no encontrado."
 
     @classmethod
     def delete_aviso(cls, index):
-        avisos = cls.load_avisos()
-        if 0 <= index < len(avisos):
-            del avisos[index]
-            return cls.save_all(avisos)
+        current_list = cls.load_avisos()
+        if 0 <= index < len(current_list):
+            target = current_list[index]
+            real_id = target.get('_id')
+            
+            if db and db.connect() and isinstance(real_id, int):
+                query = "DELETE FROM avisos WHERE id = %s"
+                db.execute_query(query, (real_id,))
+                return True, "Eliminado de BD."
+            else:
+                return cls._save_to_csv_delete(index)
         return False, "Índice no encontrado."
 
+    # --- CSV Helpers for Fallback ---
     @classmethod
-    def export_to_excel(cls, filename):
-        avisos = cls.load_avisos()
+    def _save_to_csv_append(cls, data):
+        try:
+            # We must load from CSV specifically to append safely to CSV
+            all_rows = []
+            if os.path.exists(cls.FILE_NAME):
+                with open(cls.FILE_NAME, "r", encoding="utf-8") as f:
+                    all_rows = list(csv.DictReader(f))
+            all_rows.append(data)
+            return cls._write_csv(all_rows)
+        except Exception as e: return False, str(e)
+
+    @classmethod
+    def _save_to_csv_update(cls, index, data):
+        try:
+            all_rows = []
+            if os.path.exists(cls.FILE_NAME):
+                with open(cls.FILE_NAME, "r", encoding="utf-8") as f:
+                    all_rows = list(csv.DictReader(f))
+            if 0 <= index < len(all_rows):
+                all_rows[index] = data
+                return cls._write_csv(all_rows)
+            return False, "Index Error"
+        except Exception as e: return False, str(e)
+
+    @classmethod
+    def _save_to_csv_delete(cls, index):
+        try:
+            all_rows = []
+            if os.path.exists(cls.FILE_NAME):
+                with open(cls.FILE_NAME, "r", encoding="utf-8") as f:
+                    all_rows = list(csv.DictReader(f))
+            if 0 <= index < len(all_rows):
+                del all_rows[index]
+                return cls._write_csv(all_rows)
+            return False, "Index Error"
+        except Exception as e: return False, str(e)
+
+    @classmethod
+    def _write_csv(cls, rows):
+        try:
+            with open(cls.FILE_NAME, "w", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=cls.FIELDS)
+                writer.writeheader()
+                for r in rows:
+                    writer.writerow({k: v for k, v in r.items() if k in cls.FIELDS})
+            return True, "Guardado en CSV"
+        except Exception as e: return False, str(e)
+
+    @classmethod
+    def export_to_excel(cls, filename, source_data=None):
+        # Use provided data if available, otherwise load all
+        if source_data is not None:
+            avisos = source_data
+        else:
+            avisos = cls.load_avisos()
+            
         if not avisos:
             return False, "No hay datos para exportar."
-        
-        # Define the target columns matching the ODS template
-        # FECHA, TIPO EMISOR, EMISOR, HAB., TTOO, MOTIVO LLAMADA, NOMBRE PACIENTE, NHC A XANIT, MEDICO DE URGENCIAS, OBSERVACIONES, MUNICIPIOADA, ZONA AVISO
         
         export_data = []
         for a in avisos:
@@ -914,17 +1357,19 @@ class AvisoManager:
         except Exception as e:
             return False, str(e)
 
+
+
 class MedicoManager:
     FILE_NAME = "medicos.csv"
-    FIELDS = ["Nombre", "Telefono"]
+    FIELDS = ["Nombre", "Telefono", "telegram_chat_id"]
 
     @classmethod
     def load_medicos(cls):
         if not os.path.isfile(cls.FILE_NAME):
             # Create default if not exists
             default_data = [
-                {"Nombre": "Dr. Juan Pérez", "Telefono": "34600000001"},
-                {"Nombre": "Dra. Ana Martínez", "Telefono": "34600000002"},
+                {"Nombre": "Dr. Juan Pérez", "Telefono": "34600000001", "telegram_chat_id": ""},
+                {"Nombre": "Dra. Ana Martínez", "Telefono": "34600000002", "telegram_chat_id": ""},
             ]
             cls.save_all(default_data)
             return default_data
@@ -950,9 +1395,9 @@ class MedicoManager:
             return False, str(e)
 
     @classmethod
-    def add_medico(cls, nombre, telefono):
+    def add_medico(cls, nombre, telefono, telegram_chat_id=""):
         medicos = cls.load_medicos()
-        medicos.append({"Nombre": nombre, "Telefono": telefono})
+        medicos.append({"Nombre": nombre, "Telefono": telefono, "telegram_chat_id": telegram_chat_id})
         return cls.save_all(medicos)
 
     @classmethod
@@ -971,6 +1416,15 @@ class MedicoManager:
                 return m.get("Telefono", "")
         return ""
 
+    @classmethod
+    def get_telegram_id(cls, nombre):
+        """Obtiene el telegram_chat_id de un médico por su nombre."""
+        medicos = cls.load_medicos()
+        for m in medicos:
+            if m["Nombre"] == nombre:
+                return m.get("telegram_chat_id", "")
+        return ""
+
 class MedicosTab(QWidget):
     def __init__(self):
         super().__init__()
@@ -978,8 +1432,8 @@ class MedicosTab(QWidget):
         
         # Left: List
         self.table = QTableWidget()
-        self.table.setColumnCount(2)
-        self.table.setHorizontalHeaderLabels(["Nombre del Médico", "Teléfono (+34...)"])
+        self.table.setColumnCount(3)
+        self.table.setHorizontalHeaderLabels(["Nombre del Médico", "Teléfono (+34...)", "Telegram Chat ID"])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         layout.addWidget(self.table)
@@ -996,6 +1450,22 @@ class MedicosTab(QWidget):
         self.phone_edit.setPlaceholderText("34600123456")
         ctrl_layout.addWidget(QLabel("TELÉFONO:"))
         ctrl_layout.addWidget(self.phone_edit)
+        
+        # Telegram Chat ID field with help button
+        telegram_label_layout = QHBoxLayout()
+        telegram_label = QLabel("📱 TELEGRAM CHAT ID:")
+        self.telegram_help_btn = QPushButton("❓")
+        self.telegram_help_btn.setMaximumWidth(30)
+        self.telegram_help_btn.setToolTip("Cómo obtener tu Chat ID")
+        self.telegram_help_btn.clicked.connect(self.show_telegram_help)
+        telegram_label_layout.addWidget(telegram_label)
+        telegram_label_layout.addWidget(self.telegram_help_btn)
+        telegram_label_layout.addStretch()
+        ctrl_layout.addLayout(telegram_label_layout)
+        
+        self.telegram_edit = QLineEdit()
+        self.telegram_edit.setPlaceholderText("Ej: 123456789 (opcional)")
+        ctrl_layout.addWidget(self.telegram_edit)
         
         self.add_btn = QPushButton("AÑADIR MÉDICO")
         self.add_btn.clicked.connect(self.add_medico)
@@ -1018,18 +1488,34 @@ class MedicosTab(QWidget):
         for i, m in enumerate(medicos):
             self.table.setItem(i, 0, QTableWidgetItem(m.get("Nombre", "")))
             self.table.setItem(i, 1, QTableWidgetItem(m.get("Telefono", "")))
+            self.table.setItem(i, 2, QTableWidgetItem(m.get("telegram_chat_id", "")))
 
     def add_medico(self):
         name = self.name_edit.text().strip()
         phone = self.phone_edit.text().strip()
+        telegram_id = self.telegram_edit.text().strip()
+        
         if not name:
             QMessageBox.warning(self, "Error", "El nombre es obligatorio")
             return
         
-        MedicoManager.add_medico(name, phone)
+        MedicoManager.add_medico(name, phone, telegram_id)
         self.name_edit.clear()
         self.phone_edit.clear()
+        self.telegram_edit.clear()
         self.load_data()
+    
+    def show_telegram_help(self):
+        """Muestra instrucciones para obtener el Chat ID de Telegram."""
+        from src.integrations.telegram_bot import get_chat_id_instructions
+        
+        help_text = get_chat_id_instructions()
+        
+        msg = QMessageBox(self)
+        msg.setWindowTitle("📱 Cómo obtener tu Chat ID de Telegram")
+        msg.setText(help_text)
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.exec()
 
     def delete_medico(self):
         row = self.table.currentRow()
@@ -1175,7 +1661,7 @@ class HotelesTab(QWidget):
         self.load_data()
 
     def load_default_map(self):
-        """Load a default map centered on Costa del Sol using OpenStreetMap"""
+        """Load a default map centered on Costa del Sol using Google Maps"""
         if not self.map_view:
             return
         
@@ -1197,10 +1683,10 @@ class HotelesTab(QWidget):
                 // Initialize map centered on Costa del Sol
                 var map = L.map('map').setView([36.5, -4.5], 10);
                 
-                // Add OpenStreetMap tiles
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors',
-                    maxZoom: 19
+                // Add Google Maps Tiles
+                L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+                    maxZoom: 20,
+                    subdomains:['mt0','mt1','mt2','mt3']
                 }).addTo(map);
             </script>
         </body>
@@ -1209,7 +1695,7 @@ class HotelesTab(QWidget):
         self.map_view.setHtml(html)
 
     def show_hotel_on_map(self, hotel_name):
-        """Show the selected hotel on the map using Nominatim geocoding"""
+        """Show the selected hotel on the map using Nominatim geocoding and Google Maps tiles"""
         if not self.map_view or not hotel_name:
             return
         
@@ -1234,10 +1720,10 @@ class HotelesTab(QWidget):
                 // Initialize map
                 var map = L.map('map').setView([36.5, -4.5], 13);
                 
-                // Add OpenStreetMap tiles
-                L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
-                    attribution: '© OpenStreetMap contributors',
-                    maxZoom: 19
+                // Add Google Maps Tiles
+                L.tileLayer('http://{{s}}.google.com/vt/lyrs=m&x={{x}}&y={{y}}&z={{z}}',{{
+                    maxZoom: 20,
+                    subdomains:['mt0','mt1','mt2','mt3']
                 }}).addTo(map);
                 
                 // Geocode the hotel using Nominatim
@@ -1347,6 +1833,42 @@ class AvisoForm(QWidget):
         self.estado_cb.currentTextChanged.connect(self._on_status_changed)
         
         btn_layout = QHBoxLayout()
+        
+
+        # Teams UI Container
+        teams_layout = QHBoxLayout()
+        teams_layout.setContentsMargins(0, 0, 0, 0)
+        
+        self.teams_dest_cb = QComboBox()
+        self.teams_dest_cb.setPlaceholderText("Seleccionar Destino (Canal/Médico)")
+        self.teams_dest_cb.setMinimumWidth(200)
+        self.refresh_teams_destinations()
+        
+        self.teams_config_btn = QPushButton("⚙️")
+        self.teams_config_btn.setMaximumWidth(40)
+        self.teams_config_btn.setToolTip("Configurar Canales de Teams")
+        self.teams_config_btn.clicked.connect(self.manage_teams_config)
+
+        # Teams notification button
+        self.teams_btn = QPushButton("📢 ENVIAR A TEAMS")
+        self.teams_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #6264A7; /* Teams Purple */
+                color: white;
+                border-radius: 5px;
+                padding: 8px 15px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #4b4d82;
+            }
+        """)
+        self.teams_btn.clicked.connect(self.send_teams_notification)
+        
+        teams_layout.addWidget(self.teams_dest_cb)
+        teams_layout.addWidget(self.teams_config_btn)
+        teams_layout.addWidget(self.teams_btn)
+
         self.save_btn = QPushButton("GUARDAR AVISO")
         self.save_btn.clicked.connect(self.save)
         
@@ -1355,6 +1877,7 @@ class AvisoForm(QWidget):
         self.cancel_btn.setVisible(False)
         self.cancel_btn.clicked.connect(self.reset_form)
 
+        btn_layout.addLayout(teams_layout)
         btn_layout.addStretch()
         btn_layout.addWidget(self.cancel_btn)
         btn_layout.addWidget(self.save_btn)
@@ -1377,6 +1900,73 @@ class AvisoForm(QWidget):
 
         self.reset_form()
 
+    def refresh_teams_destinations(self):
+        from src.teams_config import TeamsConfigManager
+        self.teams_dest_cb.clear()
+        dests = TeamsConfigManager.get_destinations()
+        for d in dests:
+            self.teams_dest_cb.addItem(d["name"], d["url"])
+            
+    def manage_teams_config(self):
+        from src.teams_config import TeamsConfigManager
+        
+        dlg = QDialog(self)
+        dlg.setWindowTitle("Configurar Destinatarios Teams")
+        dlg.setMinimumWidth(500)
+        layout = QVBoxLayout(dlg)
+        
+        # List
+        list_widget = QListWidget()
+        dests = TeamsConfigManager.get_destinations()
+        for d in dests:
+            list_widget.addItem(f"{d['name']} - {d['url'][:30]}...")
+            
+        layout.addWidget(QLabel("Destinatarios Configurados:"))
+        layout.addWidget(list_widget)
+        
+        # Add form
+        form_layout = QHBoxLayout()
+        name_ed = QLineEdit()
+        name_ed.setPlaceholderText("Nombre (ej: Dr. Pérez)")
+        url_ed = QLineEdit()
+        url_ed.setPlaceholderText("URL del Webhook")
+        add_btn = QPushButton("Añadir")
+        
+        def add_dest():
+            n = name_ed.text().strip()
+            u = url_ed.text().strip()
+            if not n or not u:
+                return
+            success, msg = TeamsConfigManager.add_destination(n, u)
+            if success:
+                list_widget.addItem(f"{n} - {u[:30]}...")
+                name_ed.clear()
+                url_ed.clear()
+                self.refresh_teams_destinations()
+            else:
+                QMessageBox.warning(dlg, "Error", msg)
+
+        add_btn.clicked.connect(add_dest)
+        
+        form_layout.addWidget(name_ed)
+        form_layout.addWidget(url_ed)
+        form_layout.addWidget(add_btn)
+        layout.addLayout(form_layout)
+        
+        # Delete btn
+        del_btn = QPushButton("Eliminar Seleccionado")
+        def del_dest():
+             row = list_widget.currentRow()
+             if row >= 0:
+                 if TeamsConfigManager.delete_destination(row):
+                     list_widget.takeItem(row)
+                     self.refresh_teams_destinations()
+        
+        del_btn.clicked.connect(del_dest)
+        layout.addWidget(del_btn)
+        
+        dlg.exec()
+
     def _init_fields(self):
         # --- HEADER: DATOS GENERALES ---
         # --- HEADER: DATOS GENERALES ---
@@ -1389,6 +1979,7 @@ class AvisoForm(QWidget):
         self.grid.addWidget(QLabel("FECHA:"), 1, 0, alignment=Qt.AlignmentFlag.AlignRight)
         self.fecha_edit = QDateEdit(QDate.currentDate())
         self.fecha_edit.setCalendarPopup(True)
+        self.fecha_edit.setDisplayFormat("dd/MM/yyyy")
         self.grid.addWidget(self.fecha_edit, 1, 1)
 
         self.grid.addWidget(QLabel("EMISOR:"), 1, 4, alignment=Qt.AlignmentFlag.AlignRight)
@@ -1491,9 +2082,9 @@ class AvisoForm(QWidget):
 
         # EDAD: crear contenedor para juntar etiqueta y valor
         lbl_edad = QLabel("EDAD:")
-        self.edad_spin = QSpinBox()
-        self.edad_spin.setRange(0, 120)
+        self.edad_spin = QLineEdit()
         self.edad_spin.setMaximumWidth(70)  # Ancho reducido para 3 dígitos
+        self.edad_spin.setPlaceholderText("0")
         
         # Contenedor horizontal para EDAD
         edad_container = QWidget()
@@ -1981,7 +2572,7 @@ class AvisoForm(QWidget):
         self.habitacion_edit.setText(data.get("Habitacion") or "")
         self.estado_cb.setCurrentText(data.get("Estado"))
         self.paciente_edit.setText(data.get("Paciente"))
-        self.edad_spin.setValue(int(data.get("Edad") or 0))
+        self.edad_spin.setText(str(data.get("Edad") or ""))
         self.historia_edit.setText(data.get("Historia Medica"))
         self.nacionalidad_cb.setCurrentText(data.get("Nacionalidad"))
         self.motivo_edit.setText(data.get("Motivo Urgencia"))
@@ -2029,7 +2620,7 @@ class AvisoForm(QWidget):
         
         self.habitacion_edit.clear()
         self.paciente_edit.clear()
-        self.edad_spin.setValue(0)
+        self.edad_spin.clear()
         self.historia_edit.clear()
         self.nacionalidad_cb.setCurrentIndex(-1)
         self.motivo_edit.clear()
@@ -2115,6 +2706,70 @@ class AvisoForm(QWidget):
             self.saved_signal.emit(data["Estado"])
         else:
             QMessageBox.critical(self, "Error", f"Fallo en la operación:\n{msg}")
+
+    def get_form_data(self):
+        """Recopila todos los datos del formulario en un diccionario."""
+        return {
+            "Emisor": self.emisor_cb.currentText(),
+            "Hora Solicitud": self.hora_solicitud_edit.time().toString("HH:mm"),
+            "Fecha": self.fecha_edit.date().toString("yyyy-MM-dd"),
+            "Hotel": self.hotel_cb.currentText(),
+            "Habitacion": self.habitacion_edit.text(),
+            "Estado": self.estado_cb.currentText(),
+            "Paciente": self.paciente_edit.text(),
+            "Edad": self.edad_spin.text(),
+            "Historia Medica": self.historia_edit.text(),
+            "Nacionalidad": self.nacionalidad_cb.currentText(),
+            "Motivo Urgencia": self.motivo_edit.text(),
+            "Pagador": self.pagador_cb.currentText(),
+            "Seguro": self.seguro_edit.currentText(),
+            "Touroperador": self.touroperador_edit.currentText(),
+            "Hora Aviso": self.hora_avisos_edit.time().toString("HH:mm"),
+            "Hora Finalización": self.hora_fin_edit.time().toString("HH:mm"),
+            "Medico": self.medico_edit.currentText(),
+            "Diagnostico": self.diagnostico_edit.text(),
+            "Traslado": "Si" if self.traslado_chk.isChecked() else "No",
+            "Tipo Traslado": self.tipo_traslado_cb.currentText() if self.traslado_chk.isChecked() else "",
+            "Hora Ambulancia": self.hora_ambulancia_edit.time().toString("HH:mm") if (self.traslado_chk.isChecked() and self.hora_ambulancia_edit.isEnabled()) else "",
+            "Ingreso": self.ingreso_cb.currentText(),
+            "Medico Ingreso": self.medico_ingreso_cb.currentText(),
+            "Observaciones": self.observaciones_edit.toPlainText(),
+            "Distancia": self.distancia_edit.text()
+        }
+    
+    def send_teams_notification(self):
+        """Envía notificación manual a Teams con los datos actuales del formulario."""
+        # 1. Verificar destino
+        webhook_url = self.teams_dest_cb.currentData()
+        dest_name = self.teams_dest_cb.currentText()
+        
+        if not webhook_url:
+            QMessageBox.warning(self, "Destino requerido", "Por favor, selecciona un destinatario de Teams (o configura uno nuevo con ⚙️).")
+            return
+
+        # 2. Recopilar datos (incluso si no se han guardado aún)
+        aviso_data = self.get_form_data()
+        
+        # 3. Confirmación visual para el usuario
+        confirm = QMessageBox.question(
+            self, 
+            "Enviar a Teams", 
+            f"¿Enviar los datos actuales a '{dest_name}'?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        if confirm == QMessageBox.StandardButton.Yes:
+            try:
+                # Importación diferida
+                from src.teams_sender import TeamsSender
+                
+                sender = TeamsSender(webhook_url)
+                sender.send_notification(aviso_data)
+                
+                QMessageBox.information(self, "Enviado", f"Solicitud enviada a '{dest_name}'.")
+                
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Error al enviar a Teams:\n{e}")
 
     def refresh_doctors(self):
         current_med = self.medico_edit.currentText()
@@ -2247,8 +2902,9 @@ class AvisosList(QWidget):
         self.delete_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.delete_btn.setStyleSheet(btn_style) # The object name will trigger the specific style
         
-        # Only show delete button if NOT in "TODOS" tab (filter_status != None)
-        if self.filter_status is not None:
+        
+        # Only show delete button in "AVISOS ABIERTOS" tab
+        if self.filter_status == "Abierto":
             btn_layout.addWidget(self.delete_btn)
         
         # Summary button to view selected aviso
@@ -2262,7 +2918,7 @@ class AvisosList(QWidget):
 
         # Set initial state for action buttons
         self.summary_btn.setEnabled(False)
-        if self.filter_status is not None:
+        if self.filter_status == "Abierto":
             self.delete_btn.setEnabled(False)
         
         layout.addLayout(btn_layout)
@@ -2278,11 +2934,45 @@ class AvisosList(QWidget):
         self.current_data_map = {}
 
     def export_data(self):
-        file_name, _ = QFileDialog.getSaveFileName(self, "Guardar Archivo", "Export_Avisos.ods", "ODS Files (*.ods);;Excel Files (*.xlsx)")
+        # Get selected rows
+        selected_rows = sorted(set(index.row() for index in self.table.selectionModel().selectedRows()))
+        
+        # If no selection, ask user if they want to export ALL VISIBLE
+        rows_to_export = []
+        
+        if not selected_rows:
+            # If nothing selected, export ALL rows currently in the table (filtered view)
+            # We iterate through all rows in the table
+            selected_rows = range(self.table.rowCount())
+            export_mode = "visible"
+        else:
+            export_mode = "selected"
+
+        # Load all fresh data to ensure we get full details map
+        all_avisos = AvisoManager.load_avisos()
+        # Create a dict for fast lookup by _id if needed, assuming map stores _id
+        # Actually current_data_map stores _id for each row index
+        
+        all_avisos_map = {a.get('_id'): a for a in all_avisos}
+        
+        avisos_to_export = []
+        for row in selected_rows:
+            # Get the ID mapped to this row
+            aviso_id = self.current_data_map.get(row)
+            if aviso_id is not None and aviso_id in all_avisos_map:
+                avisos_to_export.append(all_avisos_map[aviso_id])
+        
+        if not avisos_to_export:
+             QMessageBox.warning(self, "Exportar", "No hay datos seleccionados o visibles para exportar.")
+             return
+
+        context_msg = "de la SELECCIÓN" if export_mode == "selected" else "de la VISTA ACTUAL"
+        
+        file_name, _ = QFileDialog.getSaveFileName(self, f"Guardar Archivo ({len(avisos_to_export)} avisos)", "Export_Avisos.ods", "ODS Files (*.ods);;Excel Files (*.xlsx)")
         if file_name:
-            success, msg = AvisoManager.export_to_excel(file_name)
+            success, msg = AvisoManager.export_to_excel(file_name, source_data=avisos_to_export)
             if success:
-                QMessageBox.information(self, "Exportar", msg)
+                QMessageBox.information(self, "Exportar", f"Se han exportado {len(avisos_to_export)} avisos ({context_msg}) correctamente.")
             else:
                 QMessageBox.critical(self, "Error", f"Fallo al exportar:\n{msg}")
 
@@ -2359,16 +3049,19 @@ class AvisosList(QWidget):
             self.delete_row(row)
 
     def on_double_click(self, row, col):
-        original_idx = self.current_data_map.get(row)
-        if original_idx is None: return
+        aviso_id = self.current_data_map.get(row)
+        if aviso_id is None: 
+            return
 
         all_data = AvisoManager.load_avisos()
-        if 0 <= original_idx < len(all_data):
-            data = all_data[original_idx]
-            
-            # The form itself will now handle the editability of closed notices.
-            # We always open the editor.
-            self.request_edit.emit(original_idx, data)
+        
+        # Find the aviso by its _id (database ID)
+        for idx, aviso in enumerate(all_data):
+            if aviso.get('_id') == aviso_id:
+                # The form itself will now handle the editability of closed notices.
+                # We always open the editor.
+                self.request_edit.emit(idx, aviso)
+                return
 
     def on_delete_button_clicked(self):
         row = self.table.currentRow()
@@ -2409,23 +3102,27 @@ class AvisosList(QWidget):
         row = self.table.currentRow()
         is_row_selected = (row >= 0)
         self.summary_btn.setEnabled(is_row_selected)
-        self.delete_btn.setEnabled(is_row_selected)
+        if self.filter_status == "Abierto":
+            self.delete_btn.setEnabled(is_row_selected)
 
     def on_summary_button(self):
         row = self.table.currentRow()
         if row < 0:
             return
-        original_idx = self.current_data_map.get(row)
-        if original_idx is None:
+        aviso_id = self.current_data_map.get(row)
+        if aviso_id is None:
             return
+        
         all_data = AvisoManager.load_avisos()
-        if not (0 <= original_idx < len(all_data)):
-            return
-        data = all_data[original_idx]
-        dialog = AvisoSummaryDialog(data, original_idx, parent=self)
-        dialog.exec()
-        if dialog.changed:
-            self.load_data()
+        
+        # Find the aviso by its _id (database ID)
+        for idx, aviso in enumerate(all_data):
+            if aviso.get('_id') == aviso_id:
+                dialog = AvisoSummaryDialog(aviso, idx, parent=self)
+                dialog.exec()
+                if dialog.changed:
+                    self.load_data()
+                return
 
 
 class AvisoSummaryDialog(QDialog):
@@ -3190,6 +3887,308 @@ class MapaAvisosTab(QWidget):
             self.map_view.setUrl(QUrl.fromLocalFile(f.name))
 
 
+class LoginDialog(QDialog):
+    """Login screen with Vithas branding and intense neon effects"""
+    
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Vithas - Inicio de Sesión")
+        self.setFixedSize(500, 600)  # Ventana más pequeña
+        self.setModal(True)
+        
+        # Neon dark theme stylesheet
+        self.setStyleSheet("""
+            QDialog {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #0a0a15, stop:0.5 #16213e, stop:1 #0f3460);
+            }
+            QLabel {
+                color: #e0e0e0;
+                font-family: 'Segoe UI', 'Arial', sans-serif;
+            }
+            QLineEdit {
+                background-color: rgba(255, 255, 255, 0.95);
+                border: 3px solid #00d4ff;
+                border-radius: 5px;
+                padding: 14px;
+                color: #000000;
+                font-size: 16px;
+                font-weight: bold;
+            }
+            QLineEdit:focus {
+                border: 3px solid #00ffff;
+                background-color: white;
+            }
+            QLineEdit::placeholder {
+                color: #999;
+            }
+            QPushButton {
+                background-color: #3d85c6;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 14px;
+                font-size: 15px;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            QPushButton:hover {
+                background-color: #5599dd;
+            }
+            QPushButton:pressed {
+                background-color: #2a6ba8;
+            }
+            QCheckBox {
+                color: #5599dd;
+                font-size: 13px;
+                spacing: 8px;
+            }
+            QCheckBox::indicator {
+                width: 18px;
+                height: 18px;
+                border: 2px solid #5599dd;
+                border-radius: 3px;
+                background-color: white;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #3d85c6;
+                border-color: #3d85c6;
+            }
+        """)
+        
+        # Main layout
+        layout = QVBoxLayout(self)
+        layout.setSpacing(20)
+        layout.setContentsMargins(50, 40, 50, 40)
+        
+        # Vithas Logo - Large with intense neon glow
+        logo_label = QLabel()
+        if os.path.exists("logo.png"):
+            pixmap = QPixmap("logo.png")
+            scaled_pixmap = pixmap.scaledToHeight(100, Qt.TransformationMode.SmoothTransformation)
+            logo_label.setPixmap(scaled_pixmap)
+            logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        else:
+            # Text-based logo with Vithas styling
+            logo_label.setText("vithas")
+            logo_label.setStyleSheet("""
+                font-size: 64px; 
+                font-weight: 300; 
+                color: #00ffff;
+                letter-spacing: 8px;
+                font-family: 'Segoe UI Light', 'Arial', sans-serif;
+            """)
+            logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        # Add INTENSE neon glow effect to logo
+        logo_glow = QGraphicsDropShadowEffect()
+        logo_glow.setBlurRadius(40)
+        logo_glow.setColor(QColor(0, 255, 255, 220))  # Cyan brillante
+        logo_glow.setOffset(0, 0)
+        logo_label.setGraphicsEffect(logo_glow)
+        
+        layout.addWidget(logo_label)
+        layout.addSpacing(25)
+        
+        # Username field with neon glow
+        username_container = QWidget()
+        username_container.setStyleSheet("background: transparent;")
+        username_layout = QVBoxLayout(username_container)
+        username_layout.setContentsMargins(0, 0, 0, 0)
+        
+        self.username_input = QLineEdit()
+        self.username_input.setPlaceholderText("")
+        self.username_input.setMinimumHeight(50)
+        username_layout.addWidget(self.username_input)
+        
+        # Add neon glow to username field
+        username_glow = QGraphicsDropShadowEffect()
+        username_glow.setBlurRadius(20)
+        username_glow.setColor(QColor(0, 212, 255, 180))
+        username_glow.setOffset(0, 0)
+        self.username_input.setGraphicsEffect(username_glow)
+        
+        layout.addWidget(username_container)
+        
+        # Password field with visibility toggle and neon glow
+        password_container = QWidget()
+        password_container.setStyleSheet("background: transparent;")
+        password_layout = QHBoxLayout(password_container)
+        password_layout.setContentsMargins(0, 0, 0, 0)
+        password_layout.setSpacing(0)
+        
+        self.password_input = QLineEdit()
+        self.password_input.setPlaceholderText("")
+        self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.password_input.setMinimumHeight(50)
+        password_layout.addWidget(self.password_input)
+        
+        # Eye icon button integrated
+        self.toggle_password_btn = QPushButton("👁")
+        self.toggle_password_btn.setFixedSize(50, 50)
+        self.toggle_password_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.toggle_password_btn.clicked.connect(self.toggle_password_visibility)
+        self.toggle_password_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgba(255, 255, 255, 0.95);
+                border: 3px solid #00d4ff;
+                border-left: none;
+                border-radius: 0px;
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;
+                font-size: 18px;
+                color: #666;
+            }
+            QPushButton:hover {
+                background-color: white;
+                color: #333;
+            }
+        """)
+        
+        # Adjust password input styling
+        self.password_input.setStyleSheet("""
+            QLineEdit {
+                background-color: rgba(255, 255, 255, 0.95);
+                border: 3px solid #00d4ff;
+                border-right: none;
+                border-radius: 5px;
+                border-top-right-radius: 0px;
+                border-bottom-right-radius: 0px;
+                padding: 14px;
+                color: #000000;
+                font-size: 16px;
+                font-weight: bold;
+            }
+            QLineEdit:focus {
+                border: 3px solid #00ffff;
+                border-right: none;
+                background-color: white;
+            }
+        """)
+        
+        password_layout.addWidget(self.toggle_password_btn)
+        
+        # Add neon glow to password container
+        password_glow = QGraphicsDropShadowEffect()
+        password_glow.setBlurRadius(20)
+        password_glow.setColor(QColor(0, 212, 255, 180))
+        password_glow.setOffset(0, 0)
+        password_container.setGraphicsEffect(password_glow)
+        
+        layout.addWidget(password_container)
+        
+        layout.addSpacing(8)
+        
+        # Remember password checkbox
+        self.remember_checkbox = QCheckBox("Recordar la contraseña")
+        self.remember_checkbox.setStyleSheet("""
+            QCheckBox {
+                color: #5599dd;
+                font-size: 13px;
+                font-weight: 500;
+            }
+        """)
+        layout.addWidget(self.remember_checkbox)
+        
+        layout.addSpacing(15)
+        
+        # Login button with INTENSE neon glow
+        self.login_btn = QPushButton("INICIAR SESIÓN")
+        self.login_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.login_btn.clicked.connect(self.attempt_login)
+        self.login_btn.setMinimumHeight(55)
+        self.login_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #3d85c6;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 16px;
+                font-size: 16px;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+            QPushButton:hover {
+                background-color: #5599dd;
+            }
+            QPushButton:pressed {
+                background-color: #2a6ba8;
+            }
+        """)
+        
+        # Add INTENSE neon glow to button
+        btn_glow = QGraphicsDropShadowEffect()
+        btn_glow.setBlurRadius(35)
+        btn_glow.setColor(QColor(61, 133, 198, 200))  # Azul brillante
+        btn_glow.setOffset(0, 0)
+        self.login_btn.setGraphicsEffect(btn_glow)
+        
+        layout.addWidget(self.login_btn)
+        
+        layout.addSpacing(15)
+        
+        # Forgot password link with subtle glow
+        forgot_label = QLabel("¿Ha olvidado la contraseña?")
+        forgot_label.setStyleSheet("""
+            color: #aaa;
+            font-size: 12px;
+            font-weight: 400;
+        """)
+        forgot_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        forgot_label.setCursor(Qt.CursorShape.PointingHandCursor)
+        forgot_label.mousePressEvent = lambda e: self.forgot_password()
+        
+        # Subtle glow on forgot password
+        forgot_glow = QGraphicsDropShadowEffect()
+        forgot_glow.setBlurRadius(15)
+        forgot_glow.setColor(QColor(170, 170, 170, 100))
+        forgot_glow.setOffset(0, 0)
+        forgot_label.setGraphicsEffect(forgot_glow)
+        
+        layout.addWidget(forgot_label)
+        
+        layout.addStretch()
+        
+        # Allow Enter key to login
+        self.password_input.returnPressed.connect(self.attempt_login)
+        self.username_input.returnPressed.connect(self.attempt_login)
+    
+    def toggle_password_visibility(self):
+        """Toggle password visibility"""
+        if self.password_input.echoMode() == QLineEdit.EchoMode.Password:
+            self.password_input.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.toggle_password_btn.setText("🙈")
+        else:
+            self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+            self.toggle_password_btn.setText("👁")
+    
+    def attempt_login(self):
+        """Validate login credentials"""
+        username = self.username_input.text().strip()
+        password = self.password_input.text().strip()
+        
+        # Simple validation (you can replace this with actual authentication)
+        if not username or not password:
+            QMessageBox.warning(self, "Error", "Por favor ingrese usuario y contraseña")
+            return
+        
+        # Dummy authentication - accepts any non-empty credentials
+        # TODO: Replace with actual authentication logic
+        if len(username) > 0 and len(password) > 0:
+            self.accept()  # Close dialog and return Accepted
+        else:
+            QMessageBox.warning(self, "Error de Autenticación", "Usuario o contraseña incorrectos")
+    
+    def forgot_password(self):
+        """Handle forgot password"""
+        QMessageBox.information(
+            self, 
+            "Recuperar Contraseña", 
+            "Por favor contacte al administrador del sistema para recuperar su contraseña."
+        )
+
+
 class ModernMedicalApp(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -3461,9 +4460,16 @@ def main():
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     
-    window = ModernMedicalApp()
-    window.showMaximized()
-    sys.exit(app.exec())
+    # --- Login Screen ---
+    login = LoginDialog()
+    if login.exec() == QDialog.DialogCode.Accepted:
+        # If login successful, show main window
+        window = ModernMedicalApp()
+        window.showMaximized()
+        sys.exit(app.exec())
+    else:
+        # If login cancelled/closed, exit
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()

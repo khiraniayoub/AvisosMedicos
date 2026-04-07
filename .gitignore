@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Project specific
+*.bak
+.qodo/
+
+# Telegram Bot Configuration - IMPORTANT!
+.env
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
+# Mis carpetas de ejecutables pesados
+Ejecutables_Para_Clientes/
+*.dll
+*.pak

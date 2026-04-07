@@ -74,5 +74,69 @@
   "Casa Consistorial (Fuengirola)": {
     "lat": 36.5385224,
     "lon": -4.6257856
+  },
+  "f": {
+    "lat": 36.4901608,
+    "lon": -4.7430422
+  },
+  "finca Cortesin (Casares)": {
+    "lat": 36.3971442,
+    "lon": -5.2239148
+  },
+  "Finca Cortesin (Casares)": {
+    "lat": 36.3971442,
+    "lon": -5.2239148
+  },
+  "m": {
+    "lat": 36.4913467,
+    "lon": -4.7417174
+  },
+  "mB Boutique Hotel (Nerja)": {
+    "lat": 36.7441474,
+    "lon": -3.8834063
+  },
+  "ma": {
+    "lat": 36.7213028,
+    "lon": -4.4216366
+  },
+  "marbella Club Hotel": {
+    "lat": 36.5065204,
+    "lon": -4.9192157
+  },
+  "mar": {
+    "lat": 36.75235,
+    "lon": -4.0965382
+  },
+  "marbe": {
+    "lat": 36.5101821,
+    "lon": -4.8963912
+  },
+  "marbel": {
+    "lat": 36.5073689,
+    "lon": -4.8835196
+  },
+  "marbell": {
+    "lat": 36.5079499,
+    "lon": -4.8835098
+  },
+  "Marbella Club Hotel": {
+    "lat": 36.5065204,
+    "lon": -4.9192157
+  },
+  "VITHAS NERJA": {
+    "lat": 36.7471737,
+    "lon": -3.88066
+  },
+  "Eurostars Oasis Marbella": {
+    "lat": 36.5009395,
+    "lon": -4.9389871
+  },
+  "t": {
+    "lat": 36.4902214,
+    "lon": -4.7442746
+  },
+  "hotel triton": {
+    "lat": 36.5970131,
+    "lon": -4.5193291
   }
 }
