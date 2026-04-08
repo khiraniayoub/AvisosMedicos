@@ -2276,9 +2276,9 @@ class AvisoForm(QWidget):
         _estado_h = QHBoxLayout(self.estado_container)
         _estado_h.setContentsMargins(0, 0, 0, 0)
         _estado_h.setSpacing(8)
+        _estado_h.addStretch()
         _estado_h.addWidget(self.estado_lbl)
         _estado_h.addWidget(self.estado_cb)
-        _estado_h.addStretch(0)
 
         # Colocar en la esquina superior derecha ocupando 2 columnas
         self.grid.addWidget(self.estado_container, 0, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
@@ -2296,9 +2296,9 @@ class AvisoForm(QWidget):
         _nhc_h = QHBoxLayout(self.nhc_container)
         _nhc_h.setContentsMargins(0, 0, 0, 0)
         _nhc_h.setSpacing(8)
+        _nhc_h.addStretch()
         _nhc_h.addWidget(self.lbl_nhc)
         _nhc_h.addWidget(self.historia_edit)
-        _nhc_h.addStretch(0)
         
         # Colocar debajo del Estado, alineado a la derecha
         self.grid.addWidget(self.nhc_container, 1, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
@@ -2334,9 +2334,9 @@ class AvisoForm(QWidget):
         _distancia_h = QHBoxLayout(self.distancia_container)
         _distancia_h.setContentsMargins(0, 0, 0, 0)
         _distancia_h.setSpacing(8)
+        _distancia_h.addStretch()
         _distancia_h.addWidget(self.lbl_distancia)
         _distancia_h.addWidget(self.distancia_edit)
-        _distancia_h.addStretch(0)
         
         # Colocar debajo del NHC, alineado a la derecha
         self.grid.addWidget(self.distancia_container, 2, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
@@ -2396,9 +2396,9 @@ class AvisoForm(QWidget):
         _nacionalidad_h = QHBoxLayout(self.nacionalidad_container)
         _nacionalidad_h.setContentsMargins(0, 0, 0, 0)
         _nacionalidad_h.setSpacing(8)
+        _nacionalidad_h.addStretch()
         _nacionalidad_h.addWidget(self.lbl_nacionalidad)
         _nacionalidad_h.addWidget(self.nacionalidad_cb)
-        _nacionalidad_h.addStretch(0)
         
         # Colocar debajo de DISTANCIA, alineado a la derecha
         self.grid.addWidget(self.nacionalidad_container, 3, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
