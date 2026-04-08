@@ -154,14 +154,20 @@ def get_vithas_stylesheet():
         text-transform: uppercase;
     }
     QComboBox#EstadoCombo {
-        font-weight: 800;
-        font-size: 16px;
-        color: #0f3f72;
-        padding: 8px 10px;
-        border: 2px solid #0055a4;
-        border-radius: 10px;
-        background-color: rgba(0, 85, 164, 0.10);
+        font-weight: 900;
+        font-size: 15px;
+        color: #ffffff;
+        padding: 6px 12px;
+        border: 2px solid #002266;
+        border-radius: 9px;
+        background-color: #0066ff;
         text-transform: uppercase;
+    }
+    QComboBox#EstadoCombo:hover {
+        background-color: #0044cc;
+    }
+    QComboBox#EstadoCombo::drop-down {
+        border-left: 2px solid #002266;
     }
     QCheckBox#TrasladoCheck {
         font-weight: 700;
@@ -318,14 +324,20 @@ def get_neon_stylesheet():
     }
 
     QComboBox#EstadoCombo {
-        font-weight: 800;
-        font-size: 16px;
-        color: #dbe8ff;
-        padding: 8px 10px;
-        border: 2px solid #4a74cc;
-        border-radius: 10px;
-        background-color: rgba(74, 116, 204, 0.15);
+        font-weight: 900;
+        font-size: 15px;
+        color: #ffffff;
+        padding: 6px 12px;
+        border: 2px solid #1e3a8a;
+        border-radius: 9px;
+        background-color: #2563eb;
         text-transform: uppercase;
+    }
+    QComboBox#EstadoCombo:hover {
+        background-color: #1d4ed8;
+    }
+    QComboBox#EstadoCombo::drop-down {
+        border-left: 2px solid rgba(255, 255, 255, 0.2);
     }
 
     QCheckBox#TrasladoCheck {
@@ -2268,8 +2280,8 @@ class AvisoForm(QWidget):
         self.estado_cb.addItems(["Abierto", "Anulado", "Cerrado"])
         self.estado_cb.setObjectName("EstadoCombo")
         # StyleSheet moved to global CSS
-        self.estado_cb.setMinimumWidth(220)
-        self.estado_cb.setMinimumHeight(36)
+        self.estado_cb.setMinimumWidth(250)
+        self.estado_cb.setMinimumHeight(40)
 
         # Contenedor horizontal: etiqueta a la izquierda y combo a la derecha
         self.estado_container = QWidget()
@@ -2278,30 +2290,28 @@ class AvisoForm(QWidget):
         _estado_h.setSpacing(8)
         _estado_h.addWidget(self.estado_lbl)
         _estado_h.addWidget(self.estado_cb)
-        _estado_h.addStretch(0)
 
-        # Colocar en la esquina superior derecha ocupando 2 columnas
-        self.grid.addWidget(self.estado_container, 0, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
+        # Colocar en la esquina superior derecha
+        self.grid.addWidget(self.estado_container, 0, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight)
 
         # NHC debajo del Estado, alineado verticalmente
         self.lbl_nhc = QLabel("NHC:")
         self.lbl_nhc.setObjectName("EstadoLabel")  # Usar el mismo estilo que Estado para consistencia
         self.historia_edit = QLineEdit()
         self.historia_edit.setPlaceholderText("Nº Historia")
-        self.historia_edit.setMinimumWidth(220)
-        self.historia_edit.setMinimumHeight(36)
+        self.historia_edit.setMinimumWidth(250)
+        self.historia_edit.setMinimumHeight(40)
         
-        # Contenedor para NHC (similar al de Estado)
+        # Contenedor para NHC
         self.nhc_container = QWidget()
         _nhc_h = QHBoxLayout(self.nhc_container)
         _nhc_h.setContentsMargins(0, 0, 0, 0)
         _nhc_h.setSpacing(8)
         _nhc_h.addWidget(self.lbl_nhc)
         _nhc_h.addWidget(self.historia_edit)
-        _nhc_h.addStretch(0)
         
-        # Colocar debajo del Estado, alineado a la derecha
-        self.grid.addWidget(self.nhc_container, 1, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
+        # Colocar debajo del Estado
+        self.grid.addWidget(self.nhc_container, 1, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight)
 
         # --- Row 2: Hotel | Paciente | Edad | NHC ---
         # Note: Added Paciente here to keep it visible and logical
@@ -2318,6 +2328,7 @@ class AvisoForm(QWidget):
         self.grid.addWidget(QLabel("HABITACIÓN:"), 2, 4, alignment=Qt.AlignmentFlag.AlignRight)
         self.habitacion_edit = QLineEdit()
         self.habitacion_edit.setMaximumWidth(150)
+        self.habitacion_edit.setMinimumHeight(34)
         self.grid.addWidget(self.habitacion_edit, 2, 5)
 
         # DISTANCIA debajo del NHC, alineado verticalmente a la derecha
@@ -2325,21 +2336,20 @@ class AvisoForm(QWidget):
         # Usar estilo normal de etiqueta (no EstadoLabel)
         self.distancia_edit = QLineEdit()
         self.distancia_edit.setReadOnly(True)
-        self.distancia_edit.setMinimumWidth(220)
-        self.distancia_edit.setMinimumHeight(36)
+        self.distancia_edit.setMinimumWidth(250)
+        self.distancia_edit.setMinimumHeight(40)
         self.distancia_edit.setAlignment(Qt.AlignmentFlag.AlignRight)
         
-        # Contenedor para DISTANCIA (similar al de Estado y NHC)
+        # Contenedor para DISTANCIA
         self.distancia_container = QWidget()
         _distancia_h = QHBoxLayout(self.distancia_container)
         _distancia_h.setContentsMargins(0, 0, 0, 0)
         _distancia_h.setSpacing(8)
         _distancia_h.addWidget(self.lbl_distancia)
         _distancia_h.addWidget(self.distancia_edit)
-        _distancia_h.addStretch(0)
         
-        # Colocar debajo del NHC, alineado a la derecha
-        self.grid.addWidget(self.distancia_container, 2, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
+        # Colocar debajo de NHC
+        self.grid.addWidget(self.distancia_container, 2, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight)
 
         # Recompute distancia when hotel selection changes
         self.hotel_cb.currentTextChanged.connect(self.update_distancia)
