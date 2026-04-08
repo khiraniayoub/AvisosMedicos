@@ -8,14 +8,14 @@ from pathlib import Path
 from io import BytesIO
 import pandas as pd
 import requests
-from PyQt6.QtCore import QDate, QTime, Qt, pyqtSignal, QPropertyAnimation, QEasingCurve, QAbstractAnimation, QPoint, QRect, QUrl
-from PyQt6.QtGui import QColor, QPixmap, QCursor
+from PyQt6.QtCore import QDate, QTime, Qt, pyqtSignal, QPropertyAnimation, QEasingCurve, QAbstractAnimation, QPoint, QRect, QUrl, QSize
+from PyQt6.QtGui import QColor, QPixmap, QCursor, QIcon
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QFormLayout, QLineEdit, QComboBox, QDateEdit, QTimeEdit, 
                              QSpinBox, QTextEdit, QCheckBox, QPushButton, QLabel, 
                              QScrollArea, QMessageBox, QTabWidget, QTableWidget, 
                              QTableWidgetItem, QHeaderView, QFrame, QMenu, QGridLayout,
-                             QFileDialog, QGraphicsDropShadowEffect, QDialog, QListWidget)
+                             QFileDialog, QGraphicsDropShadowEffect, QDialog, QListWidget, QListView)
 
 import webbrowser
 from urllib.parse import quote
@@ -185,6 +185,21 @@ def get_vithas_stylesheet():
         border-radius: 9px;
         background-color: rgba(0, 85, 164, 0.08);
     }
+    QComboBox QAbstractItemView, QListView, QListView::item, QListView::viewport {
+        background-color: #000000;
+        background: #000000;
+        color: #ffffff;
+        border: none;
+        outline: none;
+    }
+    QListView::item:selected {
+        background-color: #0055a4;
+        color: #ffffff;
+    }
+    QListView::item:hover {
+        background-color: #e1f0ff;
+        color: #0055a4;
+    }
     """
 
 def get_neon_stylesheet():
@@ -349,6 +364,21 @@ def get_neon_stylesheet():
         border: 1px solid #3f5f9f;
         border-radius: 9px;
         background-color: rgba(63, 95, 159, 0.22);
+    }
+    QComboBox QAbstractItemView, QListView, QListView::item, QListView::viewport {
+        background-color: #000000 !important;
+        background: #000000 !important;
+        color: #f4f7ff;
+        border: none !important;
+        outline: none;
+    }
+    QListView::item:selected {
+        background-color: #35538f;
+        color: #ffffff;
+    }
+    QListView::item:hover {
+        background-color: #1a2a47;
+        color: #8fb2ff;
     }
     """
 
@@ -2136,12 +2166,23 @@ class AvisoForm(QWidget):
         
         self.teams_dest_cb = QComboBox()
         self.teams_dest_cb.setPlaceholderText("Seleccionar Destino (Canal/Médico)")
-        self.teams_dest_cb.setMinimumWidth(200)
-        self.refresh_teams_destinations()
-        
-        self.teams_config_btn = QPushButton("⚙️")
-        self.teams_config_btn.setMaximumWidth(40)
+        self.teams_config_btn = QPushButton()
+        self.teams_config_btn.setIcon(QIcon("config_gear.png"))
+        self.teams_config_btn.setIconSize(QSize(28, 28))
+        self.teams_config_btn.setMaximumWidth(45)
+        self.teams_config_btn.setMinimumHeight(38)
         self.teams_config_btn.setToolTip("Configurar Canales de Teams")
+        self.teams_config_btn.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                border: 1px solid rgba(63, 95, 159, 0.3);
+                border-radius: 6px;
+            }
+            QPushButton:hover {
+                background-color: rgba(63, 95, 159, 0.15);
+                border: 1px solid #3f5f9f;
+            }
+        """)
         self.teams_config_btn.clicked.connect(self.manage_teams_config)
 
         # Teams notification button
@@ -2285,6 +2326,7 @@ class AvisoForm(QWidget):
 
         self.grid.addWidget(QLabel("EMISOR:"), 1, 4, alignment=Qt.AlignmentFlag.AlignRight)
         self.emisor_cb = QComboBox()
+        self.emisor_cb.setView(QListView())  # Forzar estilo personalizable
         self.emisor_cb.addItems(["Jaime", "Guia", "Paciente", "Seguro", "SMCS", "VITHAS", "RECEPCION", "GP"])
         self.emisor_cb.currentTextChanged.connect(self.on_emisor_changed)
         self.emisor_cb.setMaximumWidth(150)
@@ -2297,6 +2339,7 @@ class AvisoForm(QWidget):
         # self.estado_lbl.setStyleSheet(...) MOVED TO GLOBAL CSS
 
         self.estado_cb = QComboBox()
+        self.estado_cb.setView(QListView())  # Forzar estilo personalizable
         self.estado_cb.addItems(["Abierto", "Anulado", "Cerrado"])
         self.estado_cb.setObjectName("EstadoCombo")
         # StyleSheet moved to global CSS
@@ -2340,6 +2383,7 @@ class AvisoForm(QWidget):
         self.lbl_hotel = QLabel("HOTEL:")
         self.grid.addWidget(self.lbl_hotel, 2, 0, alignment=Qt.AlignmentFlag.AlignRight)
         self.hotel_cb = QComboBox()
+        self.hotel_cb.setView(QListView())
         self.hotel_cb.setEditable(True)
         # Populate hotels
         self._reload_hotels()
@@ -2402,6 +2446,7 @@ class AvisoForm(QWidget):
         self.lbl_nacionalidad = QLabel("NACIONALIDAD:")
         # Usar estilo normal de etiqueta (no EstadoLabel)
         self.nacionalidad_cb = QComboBox()
+        self.nacionalidad_cb.setView(QListView())
         self.nacionalidad_cb.setEditable(True)
         self.nacionalidad_cb.setMinimumWidth(220)
         self.nacionalidad_cb.setMinimumHeight(36)
@@ -2447,6 +2492,7 @@ class AvisoForm(QWidget):
         # Row 5 continued
         self.grid.addWidget(QLabel("PAGADOR:"), 5, 0, alignment=Qt.AlignmentFlag.AlignRight)
         self.pagador_cb = QComboBox()
+        self.pagador_cb.setView(QListView())
         self.pagador_cb.addItems(["Paciente", "Seguro", "Hotel"])
         self.pagador_cb.currentTextChanged.connect(self.toggle_seguro_field)
         self.grid.addWidget(self.pagador_cb, 5, 1)
@@ -2454,6 +2500,7 @@ class AvisoForm(QWidget):
         # Define Touroperador fields First
         self.lbl_touroperador = QLabel("TOUROPERADOR:")
         self.touroperador_edit = QComboBox()
+        self.touroperador_edit.setView(QListView())
         self.touroperador_edit.setEditable(True)
         self.touroperador_edit.addItems([
             "TUI", "Jet2Holidays", "Vueling Holidays", "Booking.com", "Expedia", "Alltours", 
@@ -2467,6 +2514,7 @@ class AvisoForm(QWidget):
         self.lbl_seguro = QLabel("SEGURO:")
         
         self.seguro_edit = QComboBox()
+        self.seguro_edit.setView(QListView())
         self.seguro_edit.setEditable(True)
         self.seguro_edit.addItems([
             "Falck TravelCare", "SOS International", "Allianz Global Assistance", "AXA Global Healthcare", 
@@ -2513,6 +2561,7 @@ class AvisoForm(QWidget):
         self.grid.addWidget(QLabel("MÉDICO:"), 9, 0, alignment=Qt.AlignmentFlag.AlignRight)
         # Médico + Teléfono juntos para máxima legibilidad
         self.medico_edit = QComboBox()
+        self.medico_edit.setView(QListView())
         self.medico_edit.setEditable(True)
         self.medico_edit.currentTextChanged.connect(self.update_medico_phone)
 
