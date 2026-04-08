@@ -62,202 +62,190 @@ def get_vithas_stylesheet():
         border-image: url(vithas_bg.png) 0 0 0 0 stretch stretch;
     }
     QWidget {
-        font-family: 'Segoe UI', 'Roboto', sans-serif;
+        font-family: 'Segoe UI', 'Inter', 'Roboto', sans-serif;
         font-size: 13px;
     }
-    /* Make panels semi-transparent white/grey to be readable over image */
     QTabWidget::pane {
-        border: 2px solid #0055a4; /* Vithas Blue-ish */
-        background-color: rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
+        border: 1px solid rgba(0, 85, 164, 0.45);
+        background-color: rgba(255, 255, 255, 0.48);
+        border-radius: 12px;
+        padding: 8px;
     }
     QTabBar::tab {
-        background: rgba(255, 255, 255, 0.6);
-        color: #0055a4;
-        padding: 10px 20px;
-        margin-right: 4px;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-        font-weight: bold;
+        background: rgba(255, 255, 255, 0.78);
+        color: #0f3f72;
+        padding: 11px 18px;
+        margin-right: 6px;
+        border-radius: 10px 10px 0 0;
+        font-weight: 600;
+        border: 1px solid rgba(0, 85, 164, 0.30);
+        border-bottom: none;
     }
     QTabBar::tab:selected {
         background: #0055a4;
-        color: white;
+        color: #ffffff;
+    }
+    QTabBar::tab:hover {
+        background: #dce9f8;
     }
     QLabel {
-        color: #0055a4;
-        font-weight: bold;
+        color: #123f73;
+        font-weight: 600;
     }
     QLineEdit, QComboBox, QDateEdit, QTimeEdit, QSpinBox, QTextEdit {
-        background-color: rgba(255, 255, 255, 0.9);
-        border: 1px solid #aaa;
-        border-radius: 4px;
-        padding: 5px;
-        color: #333;
-        selection-background-color: #0055a4;
+        background-color: rgba(255, 255, 255, 0.94);
+        border: 1px solid #b9c7d8;
+        border-radius: 9px;
+        padding: 8px 10px;
+        color: #1f2c3a;
+        min-height: 20px;
+    }
+    QLineEdit:focus, QComboBox:focus, QTextEdit:focus, QDateEdit:focus, QTimeEdit:focus, QSpinBox:focus {
+        border: 1px solid #0055a4;
+        background-color: #ffffff;
     }
     QTableWidget {
-        background-color: rgba(255, 255, 255, 0.45);
-        gridline-color: #ccc;
-        color: #000;
-        font-weight: bold;
+        background-color: rgba(255, 255, 255, 0.88);
+        gridline-color: #d9e1ea;
+        color: #1f2c3a;
+        border-radius: 10px;
     }
     QHeaderView::section {
         background-color: #0055a4;
         color: white;
-        padding: 5px;
+        padding: 8px;
         border: none;
+        font-weight: 700;
     }
     QPushButton {
         background-color: #0055a4;
         color: white;
-        border-radius: 5px;
-        padding: 8px 15px;
-        font-weight: bold;
+        border: none;
+        border-radius: 9px;
+        padding: 9px 16px;
+        font-weight: 700;
     }
     QPushButton:hover {
-        background-color: #004488;
+        background-color: #00468a;
     }
-
-    /* --- CUSTOM COMPONENT STYLES (Vithas Mode) --- */
-    
+    QPushButton#DeleteBtn {
+        background-color: #ffffff;
+        color: #c62828;
+        border: 1px solid #c62828;
+    }
+    QPushButton#DeleteBtn:hover {
+        background-color: #c62828;
+        color: #ffffff;
+    }
     QLabel#HeaderLabel {
-        color: #0055a4;
-        font-size: 16px; 
-        font-weight: bold; 
-        text-transform: uppercase; 
-        border-bottom: 2px solid #0055a4; 
-        padding-bottom: 5px;
-        margin-top: 15px;
+        color: #0f3f72;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-bottom: 2px solid rgba(0, 85, 164, 0.5);
+        padding: 2px 0 6px 0;
+        min-height: 24px;
     }
-
     QLabel#EstadoLabel {
-        color: #0055a4; 
-        font-size: 18px; 
-        font-weight: 800; 
-        margin-bottom: 2px; 
+        color: #0f3f72;
+        font-size: 17px;
+        font-weight: 800;
+        margin-bottom: 2px;
         text-transform: uppercase;
     }
-
     QComboBox#EstadoCombo {
-        font-weight: 800; 
-        font-size: 18px; 
-        color: white; /* White text on blue bg usually, but here background is light in Vithas mode? No, Vithas mode inputs are white bg. */
-        color: #0055a4; /* Blue text */
-        padding: 8px 12px;
+        font-weight: 800;
+        font-size: 16px;
+        color: #0f3f72;
+        padding: 8px 10px;
         border: 2px solid #0055a4;
-        border-radius: 8px;
-        background-color: rgba(0, 85, 164, 0.12);
+        border-radius: 10px;
+        background-color: rgba(0, 85, 164, 0.10);
         text-transform: uppercase;
     }
-
     QCheckBox#TrasladoCheck {
-        font-weight: bold; 
-        font-size: 14px; 
-        color: #0055a4;
-        padding: 8px;
-        border: 2px solid #0055a4;
-        border-radius: 6px;
-        background-color: rgba(0, 85, 164, 0.1);
+        font-weight: 700;
+        font-size: 13px;
+        color: #0f3f72;
+        padding: 8px 10px;
+        border: 1px solid rgba(0, 85, 164, 0.55);
+        border-radius: 9px;
+        background-color: rgba(0, 85, 164, 0.08);
     }
     """
 
 def get_neon_stylesheet():
     return """
     QMainWindow, QWidget {
-        background-color: #050505; /* Deep Black */
-        color: #e0e0e0;
-        font-family: 'Segoe UI', 'Roboto', sans-serif;
+        background-color: #0b1220;
+        color: #d6deeb;
+        font-family: 'Segoe UI', 'Inter', 'Roboto', sans-serif;
         font-size: 13px;
     }
-
-    /* --- Tabs --- */
     QTabWidget::pane {
-        border: 2px solid #00f3ff;
-        background-color: #0d0d0d;
+        border: 1px solid #25314a;
+        background-color: #111a2d;
         top: -1px;
-        border-radius: 4px;
+        border-radius: 12px;
+        padding: 8px;
     }
     QTabBar::tab {
-        background: #101014;
-        color: #00f3ff;
-        padding: 12px 25px;
-        margin-right: 4px;
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-        font-weight: bold;
+        background: #151f35;
+        color: #8fb2ff;
+        padding: 11px 16px;
+        margin-right: 6px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        font-weight: 600;
         text-transform: uppercase;
-        border: 1px solid #333;
+        border: 1px solid #2a3955;
         border-bottom: none;
     }
     QTabBar::tab:selected {
-        background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1a1a2e, stop:1 #00f3ff);
-        color: #000;
-        border: 2px solid #00f3ff;
-        border-bottom: 2px solid #0d0d0d;
+        background: #1c2a46;
+        color: #f5f8ff;
+        border: 1px solid #3d5fa8;
+        border-bottom: 1px solid #111a2d;
     }
     QTabBar::tab:hover {
-        background: #1a1a25;
-        color: white;
-        border-color: #bc13fe;
+        background: #1d2a44;
+        color: #dbe8ff;
     }
-
-    /* --- Group/Headers --- */
-    QGroupBox {
-        border: 2px solid #333;
-        border-radius: 6px;
-        margin-top: 20px;
-        font-weight: bold;
-        color: #00f3ff;
-    }
-    QGroupBox::title {
-        subcontrol-origin: margin;
-        subcontrol-position: top center;
-        padding: 0 10px;
-        background-color: #050505; 
-    }
-
-    /* --- Inputs --- */
     QLineEdit, QComboBox, QDateEdit, QTimeEdit, QSpinBox, QTextEdit {
-        background-color: #101014;
-        border: 1px solid #333;
-        border-radius: 6px;
-        color: #ffffff;
-        padding: 8px;
+        background-color: #151f35;
+        border: 1px solid #2a3955;
+        border-radius: 9px;
+        color: #f4f7ff;
+        padding: 8px 10px;
         font-size: 13px;
+        min-height: 20px;
     }
     QLineEdit:focus, QComboBox:focus, QTextEdit:focus, QDateEdit:focus, QTimeEdit:focus, QSpinBox:focus {
-        border: 2px solid #00f3ff;
-        background-color: #1a1a25;
-        selection-background-color: #00f3ff;
-        selection-color: black;
+        border: 1px solid #4a74cc;
+        background-color: #1a2842;
     }
-
-    /* --- Buttons --- */
     QPushButton {
-        background-color: #101014;
-        border: 1px solid #00f3ff;
-        color: #00f3ff;
-        padding: 10px 20px;
-        border-radius: 6px;
-        font-weight: bold;
+        background-color: #1d2a46;
+        border: 1px solid #3f5f9f;
+        color: #dbe8ff;
+        padding: 9px 16px;
+        border-radius: 9px;
+        font-weight: 700;
     }
     QPushButton:hover {
-        background-color: #00f3ff;
-        color: #000000;
+        background-color: #2a3c63;
     }
     QPushButton:pressed {
-        background-color: #0099aa;
-        border-color: #0099aa;
+        background-color: #18243c;
     }
-    
     QPushButton#DeleteBtn {
-         border: 1px solid #ff0055;
-         color: #ff0055;
+         border: 1px solid #ff6b7b;
+         color: #ff9aa5;
+         background-color: transparent;
     }
     QPushButton#DeleteBtn:hover {
-        background-color: #ff0055;
-        color: white;
+        background-color: #a6303d;
+        color: #ffffff;
     }
 
     QPushButton#TelegramBtn {
@@ -269,211 +257,474 @@ def get_neon_stylesheet():
         color: white;
     }
 
-    /* --- Tables --- */
     QTableWidget {
-        background-color: #0d0d0d;
-        gridline-color: #333;
-        color: #f0f0f0;
-        selection-background-color: #00f3ff;
-        selection-color: #000000;
-        border: none;
+        background-color: #101a2c;
+        gridline-color: #263651;
+        color: #d6deeb;
+        selection-background-color: #35538f;
+        selection-color: #ffffff;
+        border-radius: 10px;
     }
     QHeaderView::section {
-        background-color: #101014;
-        color: #00f3ff;
+        background-color: #18233a;
+        color: #8fb2ff;
         padding: 8px;
-        border: 1px solid #333;
+        border: 1px solid #2a3955;
         font-weight: bold;
-        text-transform: uppercase;
     }
-    QHeaderView::section:horizontal {
-        border-bottom: 2px solid #00f3ff;
-    }
-
-    /* --- Scrollbars --- */
     QScrollBar:vertical {
-        background: #050505;
+        background: #0f1728;
         width: 12px;
     }
     QScrollBar::handle:vertical {
-        background: #333;
+        background: #31476f;
         border-radius: 6px;
         min-height: 20px;
     }
     QScrollBar::handle:vertical:hover {
-        background: #00f3ff;
+        background: #4e73bd;
     }
-    
-    /* --- Checkbox --- */
     QCheckBox {
-        color: #e0e0e0;
+        color: #c5d5f2;
         spacing: 10px;
     }
     QCheckBox::indicator {
         width: 18px;
         height: 18px;
-        border: 1px solid #555;
+        border: 1px solid #4a5f89;
         border-radius: 4px;
-        background: #101014;
+        background: #111a2d;
     }
     QCheckBox::indicator:checked {
-        background-color: #00f3ff;
-        border-color: #00f3ff;
+        background-color: #4a74cc;
+        border-color: #4a74cc;
     }
-
-    /* --- CUSTOM COMPONENT STYLES (Migrated from inline) --- */
-    
     QLabel#HeaderLabel {
-        color: #00f3ff;
-        font-size: 16px; 
-        font-weight: bold; 
-        text-transform: uppercase; 
-        border-bottom: 2px solid #00f3ff; 
-        padding-bottom: 5px;
-        margin-top: 15px; /* applied to both generally, though medicos needs it specifically */
+        color: #8fb2ff;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-bottom: 2px solid #314c81;
+        padding: 2px 0 6px 0;
+        min-height: 24px;
     }
 
     QLabel#EstadoLabel {
-        color: #00f3ff; 
-        font-size: 18px; 
-        font-weight: 800; 
-        margin-bottom: 2px; 
+        color: #8fb2ff;
+        font-size: 17px;
+        font-weight: 800;
+        margin-bottom: 2px;
         text-transform: uppercase;
     }
 
     QComboBox#EstadoCombo {
-        font-weight: 800; 
-        font-size: 18px; 
-        color: #00f3ff;
-        padding: 8px 12px;
-        border: 2px solid #00f3ff;
-        border-radius: 8px;
-        background-color: rgba(0, 243, 255, 0.12);
+        font-weight: 800;
+        font-size: 16px;
+        color: #dbe8ff;
+        padding: 8px 10px;
+        border: 2px solid #4a74cc;
+        border-radius: 10px;
+        background-color: rgba(74, 116, 204, 0.15);
         text-transform: uppercase;
     }
 
     QCheckBox#TrasladoCheck {
-        font-weight: bold; 
-        font-size: 14px; 
-        color: #00f3ff;
-        padding: 8px;
-        border: 2px solid #00f3ff;
-        border-radius: 6px;
-        background-color: rgba(0, 243, 255, 0.1);
+        font-weight: 700;
+        font-size: 13px;
+        color: #cfe0ff;
+        padding: 8px 10px;
+        border: 1px solid #3f5f9f;
+        border-radius: 9px;
+        background-color: rgba(63, 95, 159, 0.22);
     }
     """
 
 def get_light_stylesheet():
     return """
     QMainWindow, QWidget {
-        background-color: #f0f2f5;
-        color: #1d2129;
-        font-family: 'Segoe UI', 'Roboto', sans-serif;
+        background-color: #f6f8fc;
+        color: #1f2a37;
+        font-family: 'Segoe UI', 'Inter', 'Roboto', sans-serif;
         font-size: 13px;
     }
     
     /* --- Tabs --- */
     QTabWidget::pane {
-        border: 1px solid #ddd;
-        border-radius: 6px;
+        border: 1px solid #d7deea;
+        border-radius: 12px;
         background-color: #ffffff;
-        top: -1px; 
+        top: -1px;
+        padding: 8px;
     }
     QTabBar::tab {
-        background: #e4e6eb;
-        color: #606770;
-        padding: 10px 20px;
-        margin-right: 4px;
-        border-top-left-radius: 6px;
-        border-top-right-radius: 6px;
+        background: #eef2f8;
+        color: #4b5b73;
+        padding: 11px 16px;
+        margin-right: 6px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
         font-weight: 600;
-        border: 1px solid #ddd;
+        border: 1px solid #d7deea;
         border-bottom: none;
     }
     QTabBar::tab:selected {
         background: #ffffff;
-        color: #1877f2;
-        border-bottom: 2px solid #1877f2;
+        color: #1f5fbf;
+        border-bottom: 2px solid #1f5fbf;
     }
     QTabBar::tab:hover {
-        background: #f2f3f5;
-        color: #1877f2;
+        background: #e7edf7;
+        color: #1f5fbf;
     }
 
     /* --- Labels --- */
     QLabel {
-        color: #4b4f56;
-        font-weight: bold;
+        color: #36465e;
+        font-weight: 600;
     }
 
     /* --- Inputs --- */
     QLineEdit, QComboBox, QDateEdit, QTimeEdit, QSpinBox, QTextEdit {
         background-color: #ffffff;
-        border: 1px solid #ccd0d5;
-        border-radius: 4px;
-        color: #1d2129;
-        padding: 6px;
+        border: 1px solid #d0d8e6;
+        border-radius: 9px;
+        color: #1f2a37;
+        padding: 8px 10px;
+        min-height: 20px;
     }
     QLineEdit:focus, QComboBox:focus, QTextEdit:focus, QDateEdit:focus, QTimeEdit:focus, QSpinBox:focus {
-        border: 1px solid #1877f2;
+        border: 1px solid #1f5fbf;
         background-color: #fff;
     }
 
     /* --- Buttons --- */
     QPushButton {
-        background-color: #1877f2;
-        border: 1px solid #1877f2;
+        background-color: #1f5fbf;
+        border: 1px solid #1f5fbf;
         color: white;
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-weight: bold;
+        padding: 9px 16px;
+        border-radius: 9px;
+        font-weight: 700;
     }
     QPushButton:hover {
-        background-color: #166fe5;
+        background-color: #194f9f;
     }
     QPushButton:pressed {
-        background-color: #1464cf;
+        background-color: #154382;
     }
     
     QPushButton#DeleteBtn {
          background-color: #fff;
-         color: #e41e3f;
-         border: 1px solid #e41e3f;
+         color: #cc2f45;
+         border: 1px solid #cc2f45;
     }
     QPushButton#DeleteBtn:hover {
-        background-color: #e41e3f;
+        background-color: #cc2f45;
         color: white;
     }
 
     /* --- Table --- */
     QTableWidget {
         background-color: #ffffff;
-        gridline-color: #f0f2f5;
-        color: #1d2129;
+        gridline-color: #e8edf5;
+        color: #1f2a37;
         selection-background-color: #e7f3ff;
-        selection-color: #1877f2;
+        selection-color: #1f5fbf;
+        border-radius: 10px;
     }
     QHeaderView::section {
-        background-color: #f7f8fa;
-        color: #4b4f56;
-        padding: 5px;
-        border: 1px solid #ddd;
+        background-color: #f1f4f9;
+        color: #44566f;
+        padding: 8px;
+        border: 1px solid #d7deea;
     }
 
     QScrollBar:vertical {
-        background: #f0f2f5;
+        background: #f4f7fb;
         width: 12px;
     }
     QScrollBar::handle:vertical {
-        background: #bcc0c4;
+        background: #c0c9d8;
         border-radius: 6px;
     }
     
     QCheckBox {
-        color: #1877f2;
+        color: #1f5fbf;
+    }
+    QLabel#HeaderLabel {
+        color: #2b4f87;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-bottom: 2px solid #cfdaf0;
+        padding: 2px 0 6px 0;
+        min-height: 24px;
+    }
+    QLabel#EstadoLabel {
+        color: #2b4f87;
+        font-size: 17px;
+        font-weight: 800;
+    }
+    QComboBox#EstadoCombo {
+        font-weight: 800;
+        font-size: 16px;
+        color: #23457b;
+        border: 2px solid #8ea8d8;
+        border-radius: 10px;
+        background-color: #edf3ff;
+        padding: 8px 10px;
+    }
+    QCheckBox#TrasladoCheck {
+        font-weight: 700;
+        font-size: 13px;
+        color: #2b4f87;
+        padding: 8px 10px;
+        border: 1px solid #b8c9e7;
+        border-radius: 9px;
+        background-color: #f3f7ff;
     }
     """
 
+
+
+def get_graphite_stylesheet():
+    return """
+    QMainWindow, QWidget {
+        background-color: #161a22;
+        color: #dde2ee;
+        font-family: 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+        font-size: 13px;
+    }
+    QTabWidget::pane {
+        border: 1px solid #343d4f;
+        border-radius: 12px;
+        background-color: #1c2230;
+        top: -1px;
+        padding: 8px;
+    }
+    QTabBar::tab {
+        background: #232b3b;
+        color: #b6c0d6;
+        padding: 11px 16px;
+        margin-right: 6px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        font-weight: 600;
+        border: 1px solid #3a4358;
+        border-bottom: none;
+    }
+    QTabBar::tab:selected {
+        background: #2b3447;
+        color: #f4f7ff;
+        border-bottom: 2px solid #7f93bc;
+    }
+    QTabBar::tab:hover {
+        background: #2f3950;
+    }
+    QLabel {
+        color: #c8d1e6;
+        font-weight: 600;
+    }
+    QLineEdit, QComboBox, QDateEdit, QTimeEdit, QSpinBox, QTextEdit {
+        background-color: #232b3b;
+        border: 1px solid #3c4760;
+        border-radius: 9px;
+        color: #ffffff;
+        padding: 8px 10px;
+        min-height: 20px;
+    }
+    QLineEdit:focus, QComboBox:focus, QTextEdit:focus, QDateEdit:focus, QTimeEdit:focus, QSpinBox:focus {
+        border: 1px solid #86a0d1;
+        background-color: #2b3448;
+    }
+    QPushButton {
+        background-color: #3f537a;
+        border: 1px solid #4d6390;
+        color: #f6f8ff;
+        padding: 9px 16px;
+        border-radius: 9px;
+        font-weight: 700;
+    }
+    QPushButton:hover {
+        background-color: #4a6190;
+    }
+    QPushButton#DeleteBtn {
+        border: 1px solid #f28a97;
+        color: #f5a6af;
+        background-color: transparent;
+    }
+    QPushButton#DeleteBtn:hover {
+        background-color: #a6404d;
+        color: #ffffff;
+    }
+    QTableWidget {
+        background-color: #1b2231;
+        gridline-color: #334055;
+        color: #dde2ee;
+        selection-background-color: #4a6190;
+        selection-color: #ffffff;
+        border-radius: 10px;
+    }
+    QHeaderView::section {
+        background-color: #273145;
+        color: #c8d1e6;
+        padding: 8px;
+        border: 1px solid #3a4358;
+        font-weight: 700;
+    }
+    QLabel#HeaderLabel {
+        color: #c8d1e6;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-bottom: 2px solid #495976;
+        padding: 2px 0 6px 0;
+        min-height: 24px;
+    }
+    QLabel#EstadoLabel {
+        color: #c8d1e6;
+        font-size: 17px;
+        font-weight: 800;
+    }
+    QComboBox#EstadoCombo {
+        font-weight: 800;
+        font-size: 16px;
+        color: #f5f7ff;
+        border: 2px solid #6f89ba;
+        border-radius: 10px;
+        background-color: #2e3a51;
+        padding: 8px 10px;
+    }
+    QCheckBox#TrasladoCheck {
+        font-weight: 700;
+        font-size: 13px;
+        color: #d6def0;
+        padding: 8px 10px;
+        border: 1px solid #566c97;
+        border-radius: 9px;
+        background-color: #27324a;
+    }
+    """
+
+
+def get_forest_stylesheet():
+    return """
+    QMainWindow, QWidget {
+        background-color: #0f1e1c;
+        color: #d5ebe6;
+        font-family: 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+        font-size: 13px;
+    }
+    QTabWidget::pane {
+        border: 1px solid #28524d;
+        border-radius: 12px;
+        background-color: #122724;
+        top: -1px;
+        padding: 8px;
+    }
+    QTabBar::tab {
+        background: #17312d;
+        color: #9fd2c8;
+        padding: 11px 16px;
+        margin-right: 6px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        font-weight: 600;
+        border: 1px solid #2f5f58;
+        border-bottom: none;
+    }
+    QTabBar::tab:selected {
+        background: #1e3d39;
+        color: #effaf7;
+        border-bottom: 2px solid #5bb8a7;
+    }
+    QTabBar::tab:hover {
+        background: #224640;
+    }
+    QLabel {
+        color: #b7e1d8;
+        font-weight: 600;
+    }
+    QLineEdit, QComboBox, QDateEdit, QTimeEdit, QSpinBox, QTextEdit {
+        background-color: #1a3531;
+        border: 1px solid #356961;
+        border-radius: 9px;
+        color: #f2fffc;
+        padding: 8px 10px;
+        min-height: 20px;
+    }
+    QLineEdit:focus, QComboBox:focus, QTextEdit:focus, QDateEdit:focus, QTimeEdit:focus, QSpinBox:focus {
+        border: 1px solid #6fd8c4;
+        background-color: #224640;
+    }
+    QPushButton {
+        background-color: #2f6f66;
+        border: 1px solid #3d877d;
+        color: #f3fffd;
+        padding: 9px 16px;
+        border-radius: 9px;
+        font-weight: 700;
+    }
+    QPushButton:hover {
+        background-color: #3a867c;
+    }
+    QPushButton#DeleteBtn {
+        border: 1px solid #f198a1;
+        color: #f5b2b9;
+        background-color: transparent;
+    }
+    QPushButton#DeleteBtn:hover {
+        background-color: #9f4d56;
+        color: #ffffff;
+    }
+    QTableWidget {
+        background-color: #122a26;
+        gridline-color: #2a5a53;
+        color: #d5ebe6;
+        selection-background-color: #377a6f;
+        selection-color: #ffffff;
+        border-radius: 10px;
+    }
+    QHeaderView::section {
+        background-color: #1c3a35;
+        color: #b7e1d8;
+        padding: 8px;
+        border: 1px solid #2f5f58;
+        font-weight: 700;
+    }
+    QLabel#HeaderLabel {
+        color: #b7e1d8;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-bottom: 2px solid #3f7d72;
+        padding: 2px 0 6px 0;
+        min-height: 24px;
+    }
+    QLabel#EstadoLabel {
+        color: #b7e1d8;
+        font-size: 17px;
+        font-weight: 800;
+    }
+    QComboBox#EstadoCombo {
+        font-weight: 800;
+        font-size: 16px;
+        color: #f1fffc;
+        border: 2px solid #58b3a3;
+        border-radius: 10px;
+        background-color: #224640;
+        padding: 8px 10px;
+    }
+    QCheckBox#TrasladoCheck {
+        font-weight: 700;
+        font-size: 13px;
+        color: #cdece5;
+        padding: 8px 10px;
+        border: 1px solid #4b998c;
+        border-radius: 9px;
+        background-color: #1d3d38;
+    }
+    """
 
 
 class LoginDialog(QDialog):
@@ -1807,13 +2058,29 @@ class AvisoForm(QWidget):
         self.edit_mode_index = -1
         
         main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(12, 10, 12, 12)
+        main_layout.setSpacing(12)
         
         # Container widget for the form
         self.form_widget = QWidget()
         self.grid = QGridLayout(self.form_widget)
-        self.grid.setSpacing(10)
-        self.grid.setHorizontalSpacing(0)
-        self.grid.setContentsMargins(10, 10, 10, 10)
+        self.grid.setSpacing(14)
+        self.grid.setHorizontalSpacing(16)
+        self.grid.setVerticalSpacing(12)
+        self.grid.setContentsMargins(14, 14, 14, 14)
+        # Keep label columns stable and give field columns flexible space
+        self.grid.setColumnMinimumWidth(0, 96)
+        self.grid.setColumnMinimumWidth(2, 96)
+        self.grid.setColumnMinimumWidth(4, 96)
+        self.grid.setColumnMinimumWidth(6, 110)
+        self.grid.setColumnStretch(0, 0)
+        self.grid.setColumnStretch(1, 2)
+        self.grid.setColumnStretch(2, 0)
+        self.grid.setColumnStretch(3, 2)
+        self.grid.setColumnStretch(4, 0)
+        self.grid.setColumnStretch(5, 1)
+        self.grid.setColumnStretch(6, 0)
+        self.grid.setColumnStretch(7, 2)
         
         main_layout.addWidget(self.form_widget)
 
@@ -1833,11 +2100,13 @@ class AvisoForm(QWidget):
         self.estado_cb.currentTextChanged.connect(self._on_status_changed)
         
         btn_layout = QHBoxLayout()
+        btn_layout.setSpacing(10)
         
 
         # Teams UI Container
         teams_layout = QHBoxLayout()
         teams_layout.setContentsMargins(0, 0, 0, 0)
+        teams_layout.setSpacing(8)
         
         self.teams_dest_cb = QComboBox()
         self.teams_dest_cb.setPlaceholderText("Seleccionar Destino (Canal/Médico)")
@@ -2653,59 +2922,62 @@ class AvisoForm(QWidget):
              self.hotel_cb.lineEdit().clear()
 
     def save(self):
-        if not self.paciente_edit.text().strip():
-            QMessageBox.warning(self, "Campo Obligatorio", "El campo 'Paciente' es obligatorio.\nPor favor, introduzca el nombre del paciente.")
-            return
-        
-        # Validar que NHC sea obligatorio si Requiere Traslado está marcado
-        if self.traslado_chk.isChecked() and not self.historia_edit.text().strip():
-            QMessageBox.warning(self, "Campo Obligatorio", "El campo 'NHC' es obligatorio cuando se requiere traslado.\nPor favor, introduzca el número de historia clínica.")
-            return
-        
-        # Validar que NHC sea numérico si tiene valor
-        nhc_value = self.historia_edit.text().strip()
-        if nhc_value and not nhc_value.isdigit():
-            QMessageBox.warning(self, "Formato Incorrecto", "El NHC tiene que ser un número.")
-            return
+        try:
+            if not self.paciente_edit.text().strip():
+                QMessageBox.warning(self, "Campo Obligatorio", "El campo 'Paciente' es obligatorio.\nPor favor, introduzca el nombre del paciente.")
+                return
+            
+            # Validar que NHC sea obligatorio si Requiere Traslado está marcado
+            if self.traslado_chk.isChecked() and not self.historia_edit.text().strip():
+                QMessageBox.warning(self, "Campo Obligatorio", "El campo 'NHC' es obligatorio cuando se requiere traslado.\nPor favor, introduzca el número de historia clínica.")
+                return
+            
+            # Validar que NHC sea numérico si tiene valor
+            nhc_value = self.historia_edit.text().strip()
+            if nhc_value and not nhc_value.isdigit():
+                QMessageBox.warning(self, "Formato Incorrecto", "El NHC tiene que ser un número.")
+                return
 
-        data = {
-            "Emisor": self.emisor_cb.currentText(),
-            "Hora Solicitud": self.hora_solicitud_edit.time().toString("HH:mm"),
-            "Fecha": self.fecha_edit.date().toString("yyyy-MM-dd"),
-            "Hotel": self.hotel_cb.currentText(),
-            "Habitacion": self.habitacion_edit.text(),
-            "Estado": self.estado_cb.currentText(),
-            "Paciente": self.paciente_edit.text(),
-            "Edad": self.edad_spin.value(),
-            "Historia Medica": self.historia_edit.text(),
-            "Nacionalidad": self.nacionalidad_cb.currentText(),
-            "Motivo Urgencia": self.motivo_edit.text(),
-            "Pagador": self.pagador_cb.currentText(),
-            "Seguro": self.seguro_edit.currentText(),
-            "Touroperador": self.touroperador_edit.currentText(),
-            "Hora Avisos": self.hora_avisos_edit.time().toString("HH:mm"),
-            "Hora Finalizacion": self.hora_fin_edit.time().toString("HH:mm"),
-            "Medico": self.medico_edit.currentText(),
-            "Diagnostico": self.diagnostico_edit.text(),
-            "Traslado": "Si" if self.traslado_chk.isChecked() else "No",
-            "Tipo Traslado": self.tipo_traslado_cb.currentText() if self.traslado_chk.isChecked() else "",
-            "Hora Ambulancia": self.hora_ambulancia_edit.time().toString("HH:mm") if (self.traslado_chk.isChecked() and self.hora_ambulancia_edit.isEnabled()) else "",
-            "Ingreso": self.ingreso_cb.currentText(),
-            "Medico Ingreso": self.medico_ingreso_cb.currentText(),
-            "Observaciones": self.observaciones_edit.toPlainText()
-        }
+            data = {
+                "Emisor": self.emisor_cb.currentText(),
+                "Hora Solicitud": self.hora_solicitud_edit.time().toString("HH:mm"),
+                "Fecha": self.fecha_edit.date().toString("yyyy-MM-dd"),
+                "Hotel": self.hotel_cb.currentText(),
+                "Habitacion": self.habitacion_edit.text(),
+                "Estado": self.estado_cb.currentText(),
+                "Paciente": self.paciente_edit.text(),
+                "Edad": self.edad_spin.text().strip(),
+                "Historia Medica": self.historia_edit.text(),
+                "Nacionalidad": self.nacionalidad_cb.currentText(),
+                "Motivo Urgencia": self.motivo_edit.text(),
+                "Pagador": self.pagador_cb.currentText(),
+                "Seguro": self.seguro_edit.currentText(),
+                "Touroperador": self.touroperador_edit.currentText(),
+                "Hora Avisos": self.hora_avisos_edit.time().toString("HH:mm"),
+                "Hora Finalizacion": self.hora_fin_edit.time().toString("HH:mm"),
+                "Medico": self.medico_edit.currentText(),
+                "Diagnostico": self.diagnostico_edit.text(),
+                "Traslado": "Si" if self.traslado_chk.isChecked() else "No",
+                "Tipo Traslado": self.tipo_traslado_cb.currentText() if self.traslado_chk.isChecked() else "",
+                "Hora Ambulancia": self.hora_ambulancia_edit.time().toString("HH:mm") if (self.traslado_chk.isChecked() and self.hora_ambulancia_edit.isEnabled()) else "",
+                "Ingreso": self.ingreso_cb.currentText(),
+                "Medico Ingreso": self.medico_ingreso_cb.currentText(),
+                "Observaciones": self.observaciones_edit.toPlainText()
+            }
 
-        if self.edit_mode_index >= 0:
-            success, msg = AvisoManager.update_aviso(self.edit_mode_index, data)
-        else:
-            success, msg = AvisoManager.create_aviso(data)
+            if self.edit_mode_index >= 0:
+                success, msg = AvisoManager.update_aviso(self.edit_mode_index, data)
+            else:
+                success, msg = AvisoManager.create_aviso(data)
 
-        if success:
-            QMessageBox.information(self, "Sistema", msg)
-            self.reset_form()
-            self.saved_signal.emit(data["Estado"])
-        else:
-            QMessageBox.critical(self, "Error", f"Fallo en la operación:\n{msg}")
+            if success:
+                QMessageBox.information(self, "Sistema", msg)
+                self.reset_form()
+                self.saved_signal.emit(data["Estado"])
+            else:
+                QMessageBox.critical(self, "Error", f"Fallo en la operación:\n{msg}")
+        except Exception as e:
+            QMessageBox.critical(self, "Error inesperado", f"Se produjo un error al guardar:\n{e}")
 
     def get_form_data(self):
         """Recopila todos los datos del formulario en un diccionario."""
@@ -3888,71 +4160,74 @@ class MapaAvisosTab(QWidget):
 
 
 class LoginDialog(QDialog):
-    """Login screen with Vithas branding and intense neon effects"""
+    """Login screen aligned with the main app modern dark style."""
     
     def __init__(self):
         super().__init__()
+        self._remember_file = ".remember_login.json"
         self.setWindowTitle("Vithas - Inicio de Sesión")
         self.setFixedSize(500, 600)  # Ventana más pequeña
         self.setModal(True)
         
-        # Neon dark theme stylesheet
+        # Dark corporate stylesheet (same visual family as avisos screen)
         self.setStyleSheet("""
             QDialog {
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #0a0a15, stop:0.5 #16213e, stop:1 #0f3460);
+                    stop:0 #0b1220, stop:0.5 #111a2d, stop:1 #16233d);
             }
             QLabel {
-                color: #e0e0e0;
-                font-family: 'Segoe UI', 'Arial', sans-serif;
+                color: #d6deeb;
+                font-family: 'Segoe UI', 'Inter', 'Arial', sans-serif;
             }
             QLineEdit {
-                background-color: rgba(255, 255, 255, 0.95);
-                border: 3px solid #00d4ff;
-                border-radius: 5px;
+                background-color: #151f35;
+                border: 1px solid #2a3955;
+                border-radius: 9px;
                 padding: 14px;
-                color: #000000;
-                font-size: 16px;
-                font-weight: bold;
+                color: #ffffff;
+                font-size: 17px;
+                font-weight: 700;
+                selection-background-color: #4a74cc;
+                selection-color: #ffffff;
             }
             QLineEdit:focus {
-                border: 3px solid #00ffff;
-                background-color: white;
+                border: 1px solid #4a74cc;
+                background-color: #1a2842;
             }
             QLineEdit::placeholder {
-                color: #999;
+                color: #9fb3d9;
             }
             QPushButton {
-                background-color: #3d85c6;
+                background-color: #1f5fbf;
                 color: white;
                 border: none;
-                border-radius: 5px;
+                border-radius: 9px;
                 padding: 14px;
                 font-size: 15px;
                 font-weight: bold;
                 text-transform: uppercase;
             }
             QPushButton:hover {
-                background-color: #5599dd;
+                background-color: #194f9f;
             }
             QPushButton:pressed {
-                background-color: #2a6ba8;
+                background-color: #154382;
             }
             QCheckBox {
-                color: #5599dd;
+                color: #9fb3d9;
                 font-size: 13px;
                 spacing: 8px;
             }
             QCheckBox::indicator {
                 width: 18px;
                 height: 18px;
-                border: 2px solid #5599dd;
-                border-radius: 3px;
-                background-color: white;
+                border: 1px solid #4a5f89;
+                border-radius: 4px;
+                background-color: #111a2d;
             }
             QCheckBox::indicator:checked {
-                background-color: #3d85c6;
-                border-color: #3d85c6;
+                background-color: #4a74cc;
+                border-color: #4a74cc;
             }
         """)
         
@@ -3961,7 +4236,7 @@ class LoginDialog(QDialog):
         layout.setSpacing(20)
         layout.setContentsMargins(50, 40, 50, 40)
         
-        # Vithas Logo - Large with intense neon glow
+        # Vithas logo
         logo_label = QLabel()
         if os.path.exists("logo.png"):
             pixmap = QPixmap("logo.png")
@@ -3980,37 +4255,30 @@ class LoginDialog(QDialog):
             """)
             logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        # Add INTENSE neon glow effect to logo
+        # Subtle shadow for depth (avoid neon glow)
         logo_glow = QGraphicsDropShadowEffect()
-        logo_glow.setBlurRadius(40)
-        logo_glow.setColor(QColor(0, 255, 255, 220))  # Cyan brillante
-        logo_glow.setOffset(0, 0)
+        logo_glow.setBlurRadius(14)
+        logo_glow.setColor(QColor(0, 0, 0, 110))
+        logo_glow.setOffset(0, 2)
         logo_label.setGraphicsEffect(logo_glow)
         
         layout.addWidget(logo_label)
         layout.addSpacing(25)
         
-        # Username field with neon glow
+        # Username field
         username_container = QWidget()
         username_container.setStyleSheet("background: transparent;")
         username_layout = QVBoxLayout(username_container)
         username_layout.setContentsMargins(0, 0, 0, 0)
         
         self.username_input = QLineEdit()
-        self.username_input.setPlaceholderText("")
+        self.username_input.setPlaceholderText("Usuario")
         self.username_input.setMinimumHeight(50)
         username_layout.addWidget(self.username_input)
         
-        # Add neon glow to username field
-        username_glow = QGraphicsDropShadowEffect()
-        username_glow.setBlurRadius(20)
-        username_glow.setColor(QColor(0, 212, 255, 180))
-        username_glow.setOffset(0, 0)
-        self.username_input.setGraphicsEffect(username_glow)
-        
         layout.addWidget(username_container)
         
-        # Password field with visibility toggle and neon glow
+        # Password field with visibility toggle
         password_container = QWidget()
         password_container.setStyleSheet("background: transparent;")
         password_layout = QHBoxLayout(password_container)
@@ -4018,7 +4286,7 @@ class LoginDialog(QDialog):
         password_layout.setSpacing(0)
         
         self.password_input = QLineEdit()
-        self.password_input.setPlaceholderText("")
+        self.password_input.setPlaceholderText("Contraseña")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
         self.password_input.setMinimumHeight(50)
         password_layout.addWidget(self.password_input)
@@ -4030,50 +4298,43 @@ class LoginDialog(QDialog):
         self.toggle_password_btn.clicked.connect(self.toggle_password_visibility)
         self.toggle_password_btn.setStyleSheet("""
             QPushButton {
-                background-color: rgba(255, 255, 255, 0.95);
-                border: 3px solid #00d4ff;
+                background-color: #151f35;
+                border: 1px solid #2a3955;
                 border-left: none;
                 border-radius: 0px;
-                border-top-right-radius: 5px;
-                border-bottom-right-radius: 5px;
+                border-top-right-radius: 9px;
+                border-bottom-right-radius: 9px;
                 font-size: 18px;
-                color: #666;
+                color: #c6d7f6;
             }
             QPushButton:hover {
-                background-color: white;
-                color: #333;
+                background-color: #1a2842;
+                color: #ffffff;
             }
         """)
         
         # Adjust password input styling
         self.password_input.setStyleSheet("""
             QLineEdit {
-                background-color: rgba(255, 255, 255, 0.95);
-                border: 3px solid #00d4ff;
+                background-color: #151f35;
+                border: 1px solid #2a3955;
                 border-right: none;
-                border-radius: 5px;
+                border-radius: 9px;
                 border-top-right-radius: 0px;
                 border-bottom-right-radius: 0px;
                 padding: 14px;
-                color: #000000;
-                font-size: 16px;
-                font-weight: bold;
+                color: #ffffff;
+                font-size: 17px;
+                font-weight: 700;
             }
             QLineEdit:focus {
-                border: 3px solid #00ffff;
+                border: 1px solid #4a74cc;
                 border-right: none;
-                background-color: white;
+                background-color: #1a2842;
             }
         """)
         
         password_layout.addWidget(self.toggle_password_btn)
-        
-        # Add neon glow to password container
-        password_glow = QGraphicsDropShadowEffect()
-        password_glow.setBlurRadius(20)
-        password_glow.setColor(QColor(0, 212, 255, 180))
-        password_glow.setOffset(0, 0)
-        password_container.setGraphicsEffect(password_glow)
         
         layout.addWidget(password_container)
         
@@ -4092,7 +4353,7 @@ class LoginDialog(QDialog):
         
         layout.addSpacing(15)
         
-        # Login button with INTENSE neon glow
+        # Login button
         self.login_btn = QPushButton("INICIAR SESIÓN")
         self.login_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.login_btn.clicked.connect(self.attempt_login)
@@ -4116,13 +4377,6 @@ class LoginDialog(QDialog):
                 background-color: #2a6ba8;
             }
         """)
-        
-        # Add INTENSE neon glow to button
-        btn_glow = QGraphicsDropShadowEffect()
-        btn_glow.setBlurRadius(35)
-        btn_glow.setColor(QColor(61, 133, 198, 200))  # Azul brillante
-        btn_glow.setOffset(0, 0)
-        self.login_btn.setGraphicsEffect(btn_glow)
         
         layout.addWidget(self.login_btn)
         
@@ -4153,6 +4407,9 @@ class LoginDialog(QDialog):
         # Allow Enter key to login
         self.password_input.returnPressed.connect(self.attempt_login)
         self.username_input.returnPressed.connect(self.attempt_login)
+        
+        # Load remembered credentials (if any)
+        self._load_remembered_credentials()
     
     def toggle_password_visibility(self):
         """Toggle password visibility"""
@@ -4176,9 +4433,45 @@ class LoginDialog(QDialog):
         # Dummy authentication - accepts any non-empty credentials
         # TODO: Replace with actual authentication logic
         if len(username) > 0 and len(password) > 0:
+            if self.remember_checkbox.isChecked():
+                self._save_remembered_credentials(username, password)
+            else:
+                self._clear_remembered_credentials()
             self.accept()  # Close dialog and return Accepted
         else:
             QMessageBox.warning(self, "Error de Autenticación", "Usuario o contraseña incorrectos")
+
+    def _load_remembered_credentials(self):
+        try:
+            if not os.path.exists(self._remember_file):
+                return
+            with open(self._remember_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            username = str(data.get("username", "")).strip()
+            password = str(data.get("password", "")).strip()
+            if username and password:
+                self.username_input.setText(username)
+                self.password_input.setText(password)
+                self.remember_checkbox.setChecked(True)
+        except Exception:
+            # If file is corrupted, ignore and keep clean login form
+            pass
+
+    def _save_remembered_credentials(self, username: str, password: str):
+        try:
+            payload = {"username": username, "password": password}
+            with open(self._remember_file, "w", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=True, indent=2)
+        except Exception:
+            # Saving credentials should never block login
+            pass
+
+    def _clear_remembered_credentials(self):
+        try:
+            if os.path.exists(self._remember_file):
+                os.remove(self._remember_file)
+        except Exception:
+            pass
     
     def forgot_password(self):
         """Handle forgot password"""
@@ -4195,40 +4488,50 @@ class ModernMedicalApp(QMainWindow):
         self.setWindowTitle("FUTURISTIC MEDICAL MANAGER v5.0 (NEON EDITION)")
         self.resize(1200, 800)
         self.setMinimumSize(1000, 700)
-        
-        self.is_neon_mode = True
-        self.setStyleSheet(get_neon_stylesheet())
+        self.theme_definitions = [
+            ("Neon", "🌙 Neon", get_neon_stylesheet),
+            ("Light", "☀️ Light", get_light_stylesheet),
+            ("Graphite", "🩶 Graphite", get_graphite_stylesheet),
+            ("Forest", "🌿 Forest", get_forest_stylesheet),
+        ]
+        self.current_theme_index = 0
+        self.current_theme_name = self.theme_definitions[self.current_theme_index][0]
+        self.setStyleSheet(self.theme_definitions[self.current_theme_index][2]())
         
         main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(14, 12, 14, 12)
+        main_layout.setSpacing(10)
         widget = QWidget()
         widget.setLayout(main_layout)
         self.setCentralWidget(widget)
         
         # Header Layout for Logo and Theme Toggle
         header_layout = QHBoxLayout()
+        header_layout.setContentsMargins(2, 2, 2, 6)
+        header_layout.setSpacing(10)
         
         # Common Header Button Style
         header_btn_style = """
             QPushButton {
-                background-color: #1a1a25;
-                color: #e0e0e0;
-                border: 1px solid #00f3ff;
-                padding: 10px 20px;
-                border-radius: 20px;
-                font-weight: bold;
+                background-color: #1d2a46;
+                color: #dbe8ff;
+                border: 1px solid #3f5f9f;
+                padding: 9px 16px;
+                border-radius: 16px;
+                font-weight: 700;
                 min-width: 140px;
             }
             QPushButton:hover {
-                background-color: #00f3ff;
-                color: black;
+                background-color: #2a3c63;
             }
         """
 
-        # 1. Left Button: Light/Dark Mode
-        self.theme_btn = QPushButton("☀️ Light Mode")
+        # 1. Left Button: Cycle professional themes
+        self.theme_btn = QPushButton()
         self.theme_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.theme_btn.clicked.connect(self.toggle_theme)
         self.theme_btn.setStyleSheet(header_btn_style)
+        self._update_theme_button_text()
         header_layout.addWidget(self.theme_btn)
         
         header_layout.addStretch()
@@ -4298,14 +4601,11 @@ class ModernMedicalApp(QMainWindow):
         self.tab_new.refresh_hotels()
 
     def toggle_theme(self):
-        if self.is_neon_mode:
-            self.setStyleSheet(get_light_stylesheet())
-            self.theme_btn.setText("🌙 Neon Mode")
-            self.is_neon_mode = False
-        else:
-            self.setStyleSheet(get_neon_stylesheet())
-            self.theme_btn.setText("☀️ Light Mode")
-            self.is_neon_mode = True
+        # Cycle through: Neon -> Light -> Graphite -> Forest
+        self.current_theme_index = (self.current_theme_index + 1) % len(self.theme_definitions)
+        self.current_theme_name, _, theme_factory = self.theme_definitions[self.current_theme_index]
+        self.setStyleSheet(theme_factory())
+        self._update_theme_button_text()
 
     def toggle_vithas_mode(self):
         # Applies "Vithas" theme which uses a background image
@@ -4314,8 +4614,12 @@ class ModernMedicalApp(QMainWindow):
             return
 
         self.setStyleSheet(get_vithas_stylesheet())
-        self.is_neon_mode = False # Reset neon flag
-        self.theme_btn.setText("🌙 Dark Mode") # Set toggle to allow going back to dark
+        self.current_theme_name = "Vithas"
+        self.theme_btn.setText("🎨 Tema: Vithas")
+
+    def _update_theme_button_text(self):
+        _, label, _ = self.theme_definitions[self.current_theme_index]
+        self.theme_btn.setText(f"🎨 {label}")
         
     def on_tab_change(self, index):
         """Only refresh the active tab to improve performance"""

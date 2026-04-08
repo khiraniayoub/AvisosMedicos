@@ -138,5 +138,9 @@
   "hotel triton": {
     "lat": 36.5970131,
     "lon": -4.5193291
+  },
+  "Hotel Estepona Plaza": {
+    "lat": 36.4254887,
+    "lon": -5.1454638
   }
 }
