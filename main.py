@@ -94,9 +94,9 @@ def get_vithas_stylesheet():
     }
     QLineEdit, QComboBox, QDateEdit, QTimeEdit, QSpinBox, QTextEdit {
         background-color: rgba(255, 255, 255, 0.94);
-        border: 1px solid #b9c7d8;
-        border-radius: 9px;
-        padding: 8px 10px;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        padding: 5px;
         color: #1f2c3a;
         min-height: 20px;
     }
@@ -157,11 +157,12 @@ def get_vithas_stylesheet():
         font-weight: 900;
         font-size: 15px;
         color: #ffffff;
-        padding: 6px 12px;
+        padding: 4px 12px;
         border: 2px solid #002266;
         border-radius: 9px;
         background-color: #0066ff;
         text-transform: uppercase;
+        min-height: 44px;
     }
     QComboBox#EstadoCombo:hover {
         background-color: #0044cc;
@@ -327,11 +328,12 @@ def get_neon_stylesheet():
         font-weight: 900;
         font-size: 15px;
         color: #ffffff;
-        padding: 6px 12px;
+        padding: 4px 12px;
         border: 2px solid #1e3a8a;
         border-radius: 9px;
         background-color: #2563eb;
         text-transform: uppercase;
+        min-height: 44px;
     }
     QComboBox#EstadoCombo:hover {
         background-color: #1d4ed8;
@@ -2070,35 +2072,47 @@ class AvisoForm(QWidget):
         self.edit_mode_index = -1
         
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(12, 10, 12, 12)
-        main_layout.setSpacing(12)
+        main_layout.setContentsMargins(0, 0, 0, 0) # El scroll rellenará todo
+        main_layout.setSpacing(0)
         
-        # Container widget for the form
+        # --- QScrollArea para el formulario ---
+        self.scroll = QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll.setStyleSheet("background: transparent;")
+        
+        self.scroll_content = QWidget()
+        self.scroll_content.setObjectName("AvisoFormScrollContent") # Para CSS específico
+        self.scroll_layout = QVBoxLayout(self.scroll_content)
+        self.scroll_layout.setContentsMargins(12, 5, 12, 5)
+        self.scroll_layout.setSpacing(10)
+
+        # Container widget for the interactive fields
         self.form_widget = QWidget()
         self.grid = QGridLayout(self.form_widget)
         self.grid.setSpacing(14)
         self.grid.setHorizontalSpacing(16)
-        self.grid.setVerticalSpacing(12)
-        self.grid.setContentsMargins(14, 14, 14, 14)
+        self.grid.setVerticalSpacing(16) # Espacio para que respiren las redondeces
+        self.grid.setContentsMargins(14, 10, 14, 14)
         # Keep label columns stable and give field columns flexible space
         self.grid.setColumnMinimumWidth(0, 96)
         self.grid.setColumnMinimumWidth(2, 96)
         self.grid.setColumnMinimumWidth(4, 96)
         self.grid.setColumnMinimumWidth(6, 110)
-        self.grid.setColumnStretch(0, 0)
         self.grid.setColumnStretch(1, 2)
-        self.grid.setColumnStretch(2, 0)
         self.grid.setColumnStretch(3, 2)
-        self.grid.setColumnStretch(4, 0)
         self.grid.setColumnStretch(5, 1)
-        self.grid.setColumnStretch(6, 0)
         self.grid.setColumnStretch(7, 2)
         
-        main_layout.addWidget(self.form_widget)
+        self.scroll_layout.addWidget(self.form_widget)
+        self.scroll.setWidget(self.scroll_content)
+        
+        # Main layout now contains: [ScrollArea, BottomButtons]
+        main_layout.addWidget(self.scroll)
 
         self._init_fields()
 
-        # Define a list of all widgets that should be disabled when a notice is closed
+        # Lista de widgets editables para habilitar/deshabilitar según estado
         self.editable_widgets = [
             self.fecha_edit, self.emisor_cb, self.historia_edit, self.hotel_cb,
             self.habitacion_edit, self.paciente_edit, self.edad_spin,
@@ -2108,10 +2122,12 @@ class AvisoForm(QWidget):
             self.diagnostico_edit, self.traslado_chk,
             self.observaciones_edit
         ]
-        # Connect the status dropdown to the logic that enables/disables fields
         self.estado_cb.currentTextChanged.connect(self._on_status_changed)
-        
-        btn_layout = QHBoxLayout()
+
+        # Botones inferiores (fijos afuera del scroll)
+        self.bottom_btn_widget = QWidget()
+        btn_layout = QHBoxLayout(self.bottom_btn_widget)
+        btn_layout.setContentsMargins(12, 8, 12, 12)
         btn_layout.setSpacing(10)
         
 
@@ -2162,7 +2178,7 @@ class AvisoForm(QWidget):
         btn_layout.addStretch()
         btn_layout.addWidget(self.cancel_btn)
         btn_layout.addWidget(self.save_btn)
-        main_layout.addLayout(btn_layout)
+        main_layout.addWidget(self.bottom_btn_widget)
         
         # --- Pulse Animation for Save Button ---
         self.shadow_effect = QGraphicsDropShadowEffect(self.save_btn)
@@ -2250,11 +2266,9 @@ class AvisoForm(QWidget):
 
     def _init_fields(self):
         # --- HEADER: DATOS GENERALES ---
-        # --- HEADER: DATOS GENERALES ---
         lbl_general = QLabel("DATOS GENERALES")
         lbl_general.setObjectName("HeaderLabel")
-        # lbl_general.setStyleSheet(...) MOVED TO GLOBAL CSS
-        self.grid.addWidget(lbl_general, 0, 0, 1, 6)  # Deja dos últimas columnas para ESTADO
+        self.grid.addWidget(lbl_general, 0, 0, 1, 6)
 
         # --- Row 1: Fecha | Emisor | Estado ---
         self.grid.addWidget(QLabel("FECHA:"), 1, 0, alignment=Qt.AlignmentFlag.AlignRight)
@@ -2292,7 +2306,7 @@ class AvisoForm(QWidget):
         _estado_h.addWidget(self.estado_cb)
 
         # Colocar en la esquina superior derecha
-        self.grid.addWidget(self.estado_container, 0, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight)
+        self.grid.addWidget(self.estado_container, 0, 6, 1, 2, alignment=Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignTop)
 
         # NHC debajo del Estado, alineado verticalmente
         self.lbl_nhc = QLabel("NHC:")
