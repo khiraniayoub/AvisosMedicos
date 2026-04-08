@@ -22,8 +22,9 @@ class TeamsSender:
             paciente = aviso_data.get("Paciente", "Desconocido")
             hotel = aviso_data.get("Hotel", "Desconocido")
             habitacion = aviso_data.get("Habitacion", "-")
+            nhc = aviso_data.get("Historia Medica", "-")
             motivo = aviso_data.get("Motivo Urgencia", "No especificado")
-            medico = aviso_data.get("Doctor", "Sin asignar")
+            medico = aviso_data.get("Medico", "Sin asignar")
             fecha = aviso_data.get("Fecha", "")
             hora = aviso_data.get("Hora Solicitud", "")
 
@@ -90,14 +91,51 @@ class TeamsSender:
             # If that failed to show up (but got 202), it implies the Flow swallowed it.
             # Let's try simplifying to a simple TEXT message to verify connectivity first.
             
-            payload_simple = {
-                "text": f"🚨 **Nuevo Aviso**\n\n**Paciente:** {paciente}\n**Hotel:** {hotel}\n**Motivo:** {motivo}"
+            # Formatear fecha localmente para el mensaje
+            fecha_display = fecha
+            if "-" in fecha and len(fecha) == 10:
+                y, m, d = fecha.split("-")
+                fecha_display = f"{d}/{m}/{y}"
+
+            # Construir mensaje de texto simple pero completo
+            msg_lines = [
+                "🚨 **NUEVO AVISO MÉDICO**",
+                f"**Paciente:** {paciente} (NHC: {nhc})",
+                f"**Hotel:** {hotel} (Hab: {habitacion})",
+                f"**Motivo:** {motivo}",
+                f"**Médico:** {medico}",
+                f"**Fecha/Hora:** {fecha_display} - {hora}",
+                "\n_Enviado desde el Gestor de Avisos Vithas_"
+            ]
+            # Envolver el mensaje Markdown dentro de una Adaptive Card básica
+            # Esto es necesario porque la plantilla de Power Automate seleccionada
+            # exige un array 'attachments' dentro del body.
+            card_payload = {
+                "type": "AdaptiveCard",
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "version": "1.4",
+                "body": [
+                    {
+                        "type": "TextBlock",
+                        "text": "\n\n".join(msg_lines),
+                        "wrap": True
+                    }
+                ]
+            }
+
+            payload = {
+                "type": "message",
+                "attachments": [
+                    {
+                        "contentType": "application/vnd.microsoft.card.adaptive",
+                        "content": card_payload
+                    }
+                ]
             }
 
             headers = {"Content-Type": "application/json"}
             
-            # Send SIMPLE text first to debug
-            response = requests.post(self.webhook_url, json=payload_simple, headers=headers)
+            response = requests.post(self.webhook_url, json=payload, headers=headers)
             
             if response.status_code != 202:
                 print(f"Error al enviar a Teams: {response.status_code} - {response.text}")

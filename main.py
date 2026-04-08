@@ -49,6 +49,19 @@ except ImportError:
 
 # (Removed image generation - schematic summaries are HTML-based)
 
+def format_date_for_display(date_str):
+    """Convert yyyy-MM-dd to dd/MM/yyyy for Spanish UI."""
+    if not date_str or not isinstance(date_str, str) or len(date_str) < 10:
+        return date_str
+    try:
+        if "-" in date_str:
+            parts = date_str.split("-")
+            if len(parts) == 3 and len(parts[0]) == 4: # yyyy-mm-dd
+                return f"{parts[2]}/{parts[1]}/{parts[0]}"
+        return date_str
+    except Exception:
+        return date_str
+
 class ClickableLabel(QLabel):
     clicked = pyqtSignal()
     
@@ -1297,7 +1310,7 @@ def create_schematic_html(data: dict) -> str:
         "<div style='font-family:Segoe UI, Roboto, sans-serif; font-size:14px; color:#e6e6e6;'>",
         # Header row with fecha/emisor/estado
         "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'>",
-        f"<div style='font-weight:700;font-size:18px'>{fecha} — {emisor}</div>",
+        f"<div style='font-weight:700;font-size:18px'>{format_date_for_display(fecha)} — {emisor}</div>",
         f"<div style='background:{estado_color};color:#000;padding:6px 10px;border-radius:8px;font-weight:700'>{estado}</div>",
         "</div>",
 
@@ -1570,7 +1583,7 @@ class AvisoManager:
             municipio, zona = HotelLocationManager.get_location(hotel_name)
 
             row = {
-                "FECHA": val("Fecha"),
+                "FECHA": format_date_for_display(val("Fecha")),
                 "TIPO EMISOR": val("Emisor"),
                 "EMISOR": hotel_name,
                 "HAB.": val("Habitacion"), 
@@ -3073,7 +3086,7 @@ class AvisosList(QWidget):
         
         self.date_edit = QDateEdit(QDate.currentDate())
         self.date_edit.setCalendarPopup(True)
-        self.date_edit.setDisplayFormat("yyyy-MM-dd")
+        self.date_edit.setDisplayFormat("dd/MM/yyyy")
         self.date_edit.setStyleSheet("font-size: 14px; padding: 5px; min-width: 120px;")
         self.date_edit.dateChanged.connect(self.load_data)
         filter_layout.addWidget(self.date_edit)
@@ -3280,6 +3293,11 @@ class AvisosList(QWidget):
             
             for col_idx, field in enumerate(columns):
                 value = str(row_data.get(field, ""))
+                
+                # Format date for display
+                if field == "Fecha":
+                    value = format_date_for_display(value)
+                    
                 item = QTableWidgetItem(value)
                 
                 # Apply color to Status column (which is 'Estado')
@@ -3516,55 +3534,54 @@ class DashboardTab(QWidget):
         top_layout.setSpacing(15)
         
         # RIGHT SIDE: Statistics Panel with Charts
-        stats_panel = QWidget()
-        stats_panel.setStyleSheet("""
-            QWidget {
-                background-color: #0d0d0d;
-                border-radius: 10px;
+        self.stats_panel = QWidget()
+        self.stats_panel.setObjectName("StatsPanel") # Add object name for CSS
+        self.stats_panel.setStyleSheet("""
+            QWidget#StatsPanel {
+                border-radius: 12px;
+                border: 1px solid rgba(128, 128, 128, 0.2);
                 padding: 15px;
             }
         """)
-        stats_layout = QVBoxLayout(stats_panel)
+        stats_layout = QVBoxLayout(self.stats_panel)
         
         # Create two charts (compact vertical layout)
-        self.fig = Figure(figsize=(4, 4), facecolor='#0d0d0d')
+        self.fig = Figure(figsize=(4, 4))
         self.canvas = FigureCanvas(self.fig)
-        self.canvas.setStyleSheet("background-color: #0d0d0d;")
         self.canvas.setMaximumWidth(400)  # Limit width
         
         # Chart 1: Estados (Pie Chart) - TOP
         self.ax1 = self.fig.add_subplot(211)
-        self.ax1.set_facecolor('#0d0d0d')
         
         # Chart 2: Top 5 Hoteles (Bar Chart) - BOTTOM
         self.ax2 = self.fig.add_subplot(212)
-        self.ax2.set_facecolor('#0d0d0d')
         
         stats_layout.addWidget(self.canvas)
         
         # LEFT SIDE: Search Panel
-        search_panel = QWidget()
-        search_panel.setStyleSheet("""
-            QWidget {
-                background-color: #0d0d0d;
-                border-radius: 10px;
+        self.search_panel = QWidget()
+        self.search_panel.setObjectName("SearchPanel")
+        self.search_panel.setStyleSheet("""
+            QWidget#SearchPanel {
+                border-radius: 12px;
+                border: 1px solid rgba(128, 128, 128, 0.2);
                 padding: 15px;
             }
         """)
-        search_layout = QGridLayout(search_panel)
+        search_layout = QGridLayout(self.search_panel)
         search_layout.setSpacing(10)
         
         # Row 0: Date Range
         search_layout.addWidget(QLabel("FECHA DESDE:"), 0, 0, alignment=Qt.AlignmentFlag.AlignRight)
         self.date_from = QDateEdit(QDate.currentDate().addDays(-30))
         self.date_from.setCalendarPopup(True)
-        self.date_from.setDisplayFormat("yyyy-MM-dd")
+        self.date_from.setDisplayFormat("dd/MM/yyyy")
         search_layout.addWidget(self.date_from, 0, 1)
         
         search_layout.addWidget(QLabel("FECHA HASTA:"), 0, 2, alignment=Qt.AlignmentFlag.AlignRight)
         self.date_to = QDateEdit(QDate.currentDate())
         self.date_to.setCalendarPopup(True)
-        self.date_to.setDisplayFormat("yyyy-MM-dd")
+        self.date_to.setDisplayFormat("dd/MM/yyyy")
         search_layout.addWidget(self.date_to, 0, 3)
         
         # Row 1: Emisor and Hotel
@@ -3633,10 +3650,10 @@ class DashboardTab(QWidget):
         search_layout.addWidget(self.clear_btn, 4, 2, 1, 2)
         
         # Add search panel to LEFT side of top layout
-        top_layout.addWidget(search_panel)
+        top_layout.addWidget(self.search_panel)
         
         # Add charts panel to RIGHT side of top layout
-        top_layout.addWidget(stats_panel)
+        top_layout.addWidget(self.stats_panel)
         
         # Add the complete top panel (charts + search) to main layout
         layout.addWidget(top_panel)
@@ -3670,8 +3687,51 @@ class DashboardTab(QWidget):
         # Store current results
         self.current_results = []
         
+        # Default colors (will be overwritten by apply_theme)
+        self.current_bg = "#0d0d0d"
+        self.current_text = "#00f3ff"
+        self.current_accent = "#00f3ff"
+        
         # Perform initial search
         self.perform_search()
+        
+    def apply_theme(self, bg_color, text_color, accent_color):
+        """Update dashboard colors to match main theme"""
+        self.current_bg = bg_color
+        self.current_text = text_color
+        self.current_accent = accent_color
+        
+        # Update panels background
+        panel_style = f"""
+            QWidget#StatsPanel, QWidget#SearchPanel {{
+                background-color: {bg_color};
+                border-radius: 12px;
+                border: 1px solid rgba(128, 128, 128, 0.2);
+                padding: 15px;
+            }}
+        """
+        self.stats_panel.setStyleSheet(panel_style)
+        self.search_panel.setStyleSheet(panel_style)
+        
+        # Update search button style with dynamic contrast
+        text_color_css = "black" if accent_color in ["#00f3ff", "#effaf7", "#ffffff", "#8fb2ff", "#6fd8c4"] else "white"
+        self.search_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {accent_color};
+                color: {text_color_css};
+                padding: 10px 30px;
+                border-radius: 5px;
+                font-weight: bold;
+                font-size: 14px;
+            }}
+            QPushButton:hover {{
+                background-color: {accent_color};
+                opacity: 0.9;
+            }}
+        """)
+        
+        # Force chart redraw with new colors
+        self.update_charts(self.current_results)
     
     def update_charts(self, avisos):
         """Update both charts with current data"""
@@ -3679,9 +3739,16 @@ class DashboardTab(QWidget):
         self.ax1.clear()
         self.ax2.clear()
         
-        # Set dark theme colors
-        text_color = '#00f3ff'
-        grid_color = '#333333'
+        # Set theme colors
+        bg_color = self.current_bg
+        text_color = self.current_text
+        accent_color = self.current_accent
+        
+        self.fig.set_facecolor(bg_color)
+        self.ax1.set_facecolor(bg_color)
+        self.ax2.set_facecolor(bg_color)
+        
+        grid_color = '#808080' # Standard hex for Matplotlib
         
         # Chart 1: Top 5 Hoteles Distribution (Pie Chart)
         hoteles_count = {}
@@ -3716,7 +3783,7 @@ class DashboardTab(QWidget):
                 autotext.set_weight('bold')
                 autotext.set_fontsize(7)
             
-            self.ax1.set_title('Top 5 Hoteles', color=text_color, fontsize=10, weight='bold', pad=10)
+            self.ax1.set_title("Top 5 Hoteles", color=text_color, fontweight='bold')
         else:
             self.ax1.text(0.5, 0.5, 'Sin datos', ha='center', va='center', 
                          color=text_color, fontsize=14, transform=self.ax1.transAxes)
@@ -3724,21 +3791,22 @@ class DashboardTab(QWidget):
         
         # Chart 2: Top 5 Hoteles (Bar Chart)
         if hoteles_count:
-            # Get top 5
-            top_hoteles = sorted(hoteles_count.items(), key=lambda x: x[1], reverse=True)[:5]
-            hotels = [h[0][:20] + '...' if len(h[0]) > 20 else h[0] for h in top_hoteles]  # Truncate long names
-            counts = [h[1] for h in top_hoteles]
+            # Re-sort common hotels for bars
+            top_hoteles_bar = sorted(hoteles_count.items(), key=lambda x: x[1], reverse=True)[:5]
+            hotels_bar = [h[0][:15] + '..' if len(h[0]) > 15 else h[0] for h in top_hoteles_bar]
+            counts_bar = [h[1] for h in top_hoteles_bar]
             
-            bars = self.ax2.barh(hotels, counts, color='#00f3ff', edgecolor='#00d4dd', linewidth=2)
+            bars = self.ax2.barh(hotels_bar, counts_bar, color=accent_color, alpha=0.8)
+            self.ax2.set_title("Top 5 Hoteles (Barras)", color=text_color, fontsize=10, fontweight='bold')
+            self.ax2.tick_params(axis='both', colors=text_color, labelsize=8)
+            self.ax2.set_xlabel("Avisos", color=text_color, fontsize=9)
             
-            # Add value labels on bars
-            for i, (bar, count) in enumerate(zip(bars, counts)):
-                self.ax2.text(count, i, f' {count}', va='center', color=text_color, 
-                            fontsize=7, weight='bold')
+            # Add counts on bars
+            for bar in bars:
+                width = bar.get_width()
+                self.ax2.text(width, bar.get_y() + bar.get_height()/2, f' {int(width)}', 
+                             va='center', color=text_color, fontsize=8, fontweight='bold')
             
-            self.ax2.set_xlabel('Avisos', color=text_color, fontsize=8, weight='bold')
-            self.ax2.set_title('Top 5 Hoteles (Barras)', color=text_color, fontsize=10, weight='bold', pad=10)
-            self.ax2.tick_params(colors=text_color, labelsize=7)
             self.ax2.spines['bottom'].set_color(grid_color)
             self.ax2.spines['left'].set_color(grid_color)
             self.ax2.spines['top'].set_visible(False)
@@ -3852,6 +3920,11 @@ class DashboardTab(QWidget):
         for i, aviso in enumerate(filtered):
             for col_idx, field in enumerate(AvisoManager.FIELDS):
                 value = str(aviso.get(field, ""))
+                
+                # Format date for display
+                if field == "Fecha":
+                    value = format_date_for_display(value)
+                    
                 item = QTableWidgetItem(value)
                 
                 # Color by estado
@@ -3891,7 +3964,7 @@ class DashboardTab(QWidget):
                 municipio, zona = HotelLocationManager.get_location(hotel_name)
                 
                 row = {
-                    "FECHA": val("Fecha"),
+                    "FECHA": format_date_for_display(val("Fecha")),
                     "TIPO EMISOR": val("Emisor"),
                     "EMISOR": hotel_name,
                     "HAB.": val("Habitacion"),
@@ -4127,7 +4200,7 @@ class MapaAvisosTab(QWidget):
                 <hr style='margin: 5px 0;'>
                 <b>🏨 Hotel:</b> {hotel_name}<br>
                 <b>👤 Paciente:</b> {paciente}<br>
-                <b>📅 Fecha:</b> {fecha} {hora}<br>
+                <b>📅 Fecha:</b> {format_date_for_display(fecha)} {hora}<br>
                 <b>⚕️ Motivo:</b> {motivo}<br>
                 {f'<b>👨‍⚕️ Médico:</b> {medico}<br>' if medico != 'N/A' else ''}
                 {f'<b>🩺 Diagnóstico:</b> {diagnostico}<br>' if diagnostico != 'N/A' else ''}
@@ -4497,6 +4570,15 @@ class ModernMedicalApp(QMainWindow):
         self.current_theme_index = 0
         self.current_theme_name = self.theme_definitions[self.current_theme_index][0]
         self.setStyleSheet(self.theme_definitions[self.current_theme_index][2]())
+
+        # Theme color mapping for Dashboard/Charts: (Background, Text, Accent)
+        self.theme_colors = {
+            "Neon": ("#111a2d", "#8fb2ff", "#4a74cc"),
+            "Light": ("#ffffff", "#36465e", "#1f5fbf"),
+            "Graphite": ("#1c2230", "#c8d1e6", "#7f93bc"),
+            "Forest": ("#122724", "#b7e1d8", "#5bb8a7"),
+            "Vithas": ("#ffffff", "#123f73", "#0055a4")
+        }
         
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(14, 12, 14, 12)
@@ -4572,6 +4654,10 @@ class ModernMedicalApp(QMainWindow):
         self.tab_hoteles = HotelesTab()
         self.tab_dashboard = DashboardTab()
         
+        # Apply initial theme colors to Dashboard
+        initial_colors = self.theme_colors.get(self.current_theme_name, self.theme_colors["Neon"])
+        self.tab_dashboard.apply_theme(*initial_colors)
+
         # Connect save signal to auto-switch tab
         self.tab_new.saved_signal.connect(self.on_aviso_saved)
 
@@ -4607,6 +4693,11 @@ class ModernMedicalApp(QMainWindow):
         self.setStyleSheet(theme_factory())
         self._update_theme_button_text()
 
+        # Update Dashboard colors
+        if self.current_theme_name in self.theme_colors:
+            colors = self.theme_colors[self.current_theme_name]
+            self.tab_dashboard.apply_theme(*colors)
+
     def toggle_vithas_mode(self):
         # Applies "Vithas" theme which uses a background image
         if not os.path.exists("vithas_bg.jpg") and not os.path.exists("vithas_bg.png"):
@@ -4616,6 +4707,10 @@ class ModernMedicalApp(QMainWindow):
         self.setStyleSheet(get_vithas_stylesheet())
         self.current_theme_name = "Vithas"
         self.theme_btn.setText("🎨 Tema: Vithas")
+
+        # Update Dashboard colors
+        colors = self.theme_colors["Vithas"]
+        self.tab_dashboard.apply_theme(*colors)
 
     def _update_theme_button_text(self):
         _, label, _ = self.theme_definitions[self.current_theme_index]

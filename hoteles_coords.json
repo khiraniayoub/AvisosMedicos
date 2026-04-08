@@ -142,5 +142,13 @@
   "Hotel Estepona Plaza": {
     "lat": 36.4254887,
     "lon": -5.1454638
+  },
+  "Hotel El Pilar Andalucia (Estepona)": {
+    "lat": 36.4254887,
+    "lon": -5.1454638
+  },
+  "VITHAS MALAGA": {
+    "lat": 36.7226782,
+    "lon": -4.3972308
   }
 }

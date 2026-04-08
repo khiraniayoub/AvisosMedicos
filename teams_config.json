@@ -7,6 +7,10 @@
     {
       "name": "Canal Nuevo (Auto)",
       "url": "https://defaulte4f11f0114dc4099b8cfc1fab2e970.1f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/57226b97d6cf4688a86cb0f23854be83/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Ju_DsWZjPtTQIziNymZctRsL6oU6tlTh4q3Q_YYzs8Y"
+    },
+    {
+      "name": "ROSA",
+      "url": "https://defaulte4f11f0114dc4099b8cfc1fab2e970.1f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a06ab767214347feaf4817227da14c53/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=mwTaNCLGBxEaxwzuIXRLWnhks6fATy50kL2OhZV9Ssk"
     }
   ]
 }
