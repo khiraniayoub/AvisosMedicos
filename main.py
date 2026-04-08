@@ -2070,36 +2070,50 @@ class AvisoForm(QWidget):
         super().__init__()
         self.edit_mode_index = -1
         
-        main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(12, 10, 12, 12)
-        main_layout.setSpacing(12)
+        self.edit_mode_index = -1
         
-        # Container widget for the form
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+        
+        # --- QScrollArea para el formulario ---
+        self.scroll = QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.scroll.setStyleSheet("background: transparent;")
+        
+        self.scroll_content = QWidget()
+        self.scroll_content.setObjectName("AvisoFormScrollContent")
+        self.scroll_layout = QVBoxLayout(self.scroll_content)
+        self.scroll_layout.setContentsMargins(12, 10, 12, 10)
+        self.scroll_layout.setSpacing(10)
+
+        # Container widget for the interactive fields
         self.form_widget = QWidget()
         self.grid = QGridLayout(self.form_widget)
         self.grid.setSpacing(14)
         self.grid.setHorizontalSpacing(16)
-        self.grid.setVerticalSpacing(12)
+        self.grid.setVerticalSpacing(16) # Espacio para redondeces
         self.grid.setContentsMargins(14, 14, 14, 14)
-        # Keep label columns stable and give field columns flexible space
+        
+        # ColStretch and widths
         self.grid.setColumnMinimumWidth(0, 96)
         self.grid.setColumnMinimumWidth(2, 96)
         self.grid.setColumnMinimumWidth(4, 96)
         self.grid.setColumnMinimumWidth(6, 110)
-        self.grid.setColumnStretch(0, 0)
         self.grid.setColumnStretch(1, 2)
-        self.grid.setColumnStretch(2, 0)
         self.grid.setColumnStretch(3, 2)
-        self.grid.setColumnStretch(4, 0)
         self.grid.setColumnStretch(5, 1)
-        self.grid.setColumnStretch(6, 0)
         self.grid.setColumnStretch(7, 2)
         
-        main_layout.addWidget(self.form_widget)
+        self.scroll_layout.addWidget(self.form_widget)
+        self.scroll.setWidget(self.scroll_content)
+        
+        main_layout.addWidget(self.scroll)
 
         self._init_fields()
 
-        # Define a list of all widgets that should be disabled when a notice is closed
+        # Re-add editable_widgets list (needed for status-based enabling/disabling)
         self.editable_widgets = [
             self.fecha_edit, self.emisor_cb, self.historia_edit, self.hotel_cb,
             self.habitacion_edit, self.paciente_edit, self.edad_spin,
@@ -2109,7 +2123,6 @@ class AvisoForm(QWidget):
             self.diagnostico_edit, self.traslado_chk,
             self.observaciones_edit
         ]
-        # Connect the status dropdown to the logic that enables/disables fields
         self.estado_cb.currentTextChanged.connect(self._on_status_changed)
         
         btn_layout = QHBoxLayout()
@@ -2158,12 +2171,18 @@ class AvisoForm(QWidget):
         self.cancel_btn.setObjectName("DeleteBtn")
         self.cancel_btn.setVisible(False)
         self.cancel_btn.clicked.connect(self.reset_form)
+        
+        # Botones inferiores (fijos afuera del scroll)
+        self.bottom_btn_widget = QWidget()
+        btn_layout = QHBoxLayout(self.bottom_btn_widget)
+        btn_layout.setContentsMargins(12, 8, 12, 12)
+        btn_layout.setSpacing(10)
 
         btn_layout.addLayout(teams_layout)
         btn_layout.addStretch()
         btn_layout.addWidget(self.cancel_btn)
         btn_layout.addWidget(self.save_btn)
-        main_layout.addLayout(btn_layout)
+        main_layout.addWidget(self.bottom_btn_widget)
         
         # --- Pulse Animation for Save Button ---
         self.shadow_effect = QGraphicsDropShadowEffect(self.save_btn)
