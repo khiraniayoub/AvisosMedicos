@@ -246,5 +246,9 @@
   "Travelodge Málaga Airport": {
     "lat": 36.6825469,
     "lon": -4.4687805
+  },
+  "Leonardo Hotel Fuengirola": {
+    "lat": 36.5440108,
+    "lon": -4.6192065
   }
 }
