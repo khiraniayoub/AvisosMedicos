@@ -2059,6 +2059,8 @@ class AvisoForm(QWidget):
     def __init__(self):
         super().__init__()
         self.edit_mode_index = -1
+        self._loading_aviso = False
+        self._traslado_prev_checked = False
         
         self.edit_mode_index = -1
         
@@ -2599,7 +2601,10 @@ class AvisoForm(QWidget):
 
         self.lbl_hora_ambulancia = QLabel("HORA AMB.:")
         self.grid.addWidget(self.lbl_hora_ambulancia, 10, 4, alignment=Qt.AlignmentFlag.AlignRight)
-        self.hora_ambulancia_edit = QTimeEdit(QTime.currentTime())
+        self.hora_ambulancia_edit = QTimeEdit()
+        self.hora_ambulancia_edit.setDisplayFormat("HH:mm")
+        self.hora_ambulancia_edit.setSpecialValueText("")
+        self.hora_ambulancia_edit.setTime(QTime(0, 0))
         self.hora_ambulancia_edit.setEnabled(False)
         self.grid.addWidget(self.hora_ambulancia_edit, 10, 5)
 
@@ -2739,8 +2744,16 @@ class AvisoForm(QWidget):
         dist = haversine_km(coord, HOSPITAL_XANIT_COORD)
         self.distancia_edit.setText(f"{dist:.1f}")
 
+    def _clear_hora_ambulancia(self):
+        """Represent empty value using special minimum time."""
+        self.hora_ambulancia_edit.setTime(QTime(0, 0))
+
+    def _is_hora_ambulancia_empty(self):
+        return self.hora_ambulancia_edit.time() == QTime(0, 0)
+
     def toggle_traslado(self):
         checked = self.traslado_chk.isChecked()
+        was_checked = self._traslado_prev_checked
         
         # List of widgets to enable/disable
         widgets = [self.tipo_traslado_cb, self.ingreso_cb, self.medico_ingreso_cb]
@@ -2765,9 +2778,19 @@ class AvisoForm(QWidget):
         if not checked: 
             self.hora_ambulancia_edit.setEnabled(False)
             self.hora_ambulancia_edit.setStyleSheet(disabled_style)
+            self._clear_hora_ambulancia()
         else:
             # Re-evaluate based on type logic
             self.toggle_ambulancia(self.tipo_traslado_cb.currentText())
+            # Auto-fill only on user transition OFF -> ON, and only when empty.
+            if (
+                not self._loading_aviso
+                and not was_checked
+                and self.hora_ambulancia_edit.isEnabled()
+                and self._is_hora_ambulancia_empty()
+            ):
+                self.hora_ambulancia_edit.setTime(QTime.currentTime())
+        self._traslado_prev_checked = checked
 
     def toggle_ambulancia(self, text):
         # Only touch this if Traslado is actually checked. 
@@ -2862,6 +2885,7 @@ class AvisoForm(QWidget):
         self.edit_mode_index = index
         self.save_btn.setText("ACTUALIZAR DATOS")
         self.cancel_btn.setVisible(True)
+        self._loading_aviso = True
 
         # --- CRITICAL SECTION: Block all signals to control population order ---
         self.emisor_cb.blockSignals(True)
@@ -2922,7 +2946,9 @@ class AvisoForm(QWidget):
         self.diagnostico_edit.setText(data.get("Diagnostico"))
         self.traslado_chk.setChecked(data.get("Traslado") == "Si")
         self.tipo_traslado_cb.setCurrentText(data.get("Tipo Traslado"))
-        self.hora_ambulancia_edit.setTime(QTime.fromString(data.get("Hora Ambulancia", "00:00"), "HH:mm"))
+        hora_amb_text = str(data.get("Hora Ambulancia", "") or "").strip()
+        hora_amb = QTime.fromString(hora_amb_text, "HH:mm") if hora_amb_text else QTime(0, 0)
+        self.hora_ambulancia_edit.setTime(hora_amb if hora_amb.isValid() else QTime(0, 0))
         self.ingreso_cb.setCurrentText(data.get("Ingreso"))
         self.medico_ingreso_cb.setCurrentText(data.get("Medico Ingreso"))
         self.observaciones_edit.setText(data.get("Observaciones"))
@@ -2939,6 +2965,8 @@ class AvisoForm(QWidget):
         # Manually trigger all UI updates that depend on the loaded data
         self.toggle_seguro_field(self.pagador_cb.currentText())
         self.toggle_traslado() # This will also handle the dependent ambulancia field
+        self._loading_aviso = False
+        self._traslado_prev_checked = self.traslado_chk.isChecked()
         self.update_distancia(self.hotel_cb.currentText())
         self.update_medico_phone(self.medico_edit.currentText())
 
@@ -2965,6 +2993,7 @@ class AvisoForm(QWidget):
         self.medico_edit.setCurrentIndex(-1)
         self.diagnostico_edit.clear()
         self.traslado_chk.setChecked(False)
+        self._clear_hora_ambulancia()
         self.ingreso_cb.setCurrentIndex(-1)
         self.medico_ingreso_cb.setCurrentIndex(-1)
         self.observaciones_edit.clear()
