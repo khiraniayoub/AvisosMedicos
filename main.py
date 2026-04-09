@@ -194,12 +194,25 @@ def get_vithas_stylesheet():
         border-radius: 9px;
         background-color: rgba(0, 85, 164, 0.08);
     }
-    QComboBox QAbstractItemView, QListView, QListView::item, QListView::viewport {
+    QComboBox QAbstractItemView, QListView {
         background-color: #000000;
         background: #000000;
         color: #ffffff;
-        border: none;
+        border: 1px solid #000000;
         outline: none;
+        padding: 0;
+        margin: 0;
+    }
+    QComboBox QAbstractItemView::viewport, QListView::viewport {
+        background-color: #000000;
+        background: #000000;
+        margin: 0;
+        padding: 0;
+    }
+    QComboBox QAbstractItemView::item, QListView::item {
+        background-color: #000000;
+        color: #ffffff;
+        margin: 0;
     }
     QListView::item:selected {
         background-color: #0055a4;
@@ -365,12 +378,25 @@ def get_neon_stylesheet():
         border-radius: 9px;
         background-color: rgba(63, 95, 159, 0.22);
     }
-    QComboBox QAbstractItemView, QListView, QListView::item, QListView::viewport {
+    QComboBox QAbstractItemView, QListView {
         background-color: #000000 !important;
         background: #000000 !important;
         color: #f4f7ff;
-        border: none !important;
+        border: 1px solid #000000 !important;
         outline: none;
+        padding: 0;
+        margin: 0;
+    }
+    QComboBox QAbstractItemView::viewport, QListView::viewport {
+        background-color: #000000 !important;
+        background: #000000 !important;
+        margin: 0;
+        padding: 0;
+    }
+    QComboBox QAbstractItemView::item, QListView::item {
+        background-color: #000000 !important;
+        color: #f4f7ff;
+        margin: 0;
     }
     QListView::item:selected {
         background-color: #35538f;
@@ -2104,6 +2130,7 @@ class AvisoForm(QWidget):
         main_layout.addWidget(self.scroll)
 
         self._init_fields()
+        self._enforce_black_combo_popups()
 
         # Re-add editable_widgets list (needed for status-based enabling/disabling)
         self.editable_widgets = [
@@ -2204,6 +2231,49 @@ class AvisoForm(QWidget):
 
         self.refresh_teams_destinations()
         self.reset_form()
+
+    def _style_combo_popup_black(self, combo: QComboBox):
+        """Force pure-black popup (Qt can paint popup container separately)."""
+        view = combo.view()
+        if not view:
+            return
+        view.setStyleSheet("""
+            QListView, QAbstractItemView, QWidget {
+                background-color: #000000;
+                color: #ffffff;
+                border: 1px solid #000000;
+            }
+            QListView::viewport, QAbstractItemView::viewport {
+                background-color: #000000;
+                margin: 0;
+                padding: 0;
+            }
+            QListView::item, QAbstractItemView::item {
+                background-color: #000000;
+                color: #ffffff;
+                margin: 0;
+            }
+        """)
+        popup_window = view.window()
+        if popup_window:
+            popup_window.setStyleSheet("background-color: #000000; border: 1px solid #000000;")
+
+    def _enforce_black_combo_popups(self):
+        combos = [
+            self.emisor_cb,
+            self.estado_cb,
+            self.pagador_cb,
+            self.nacionalidad_cb,
+            self.hotel_cb,
+            self.seguro_edit,
+            self.touroperador_edit,
+            self.medico_edit,
+            self.ingreso_cb,
+            self.tipo_traslado_cb,
+            self.medico_ingreso_cb,
+        ]
+        for c in combos:
+            self._style_combo_popup_black(c)
 
     def refresh_teams_destinations(self, selected_name=None):
         from src.teams_config import TeamsConfigManager
@@ -2594,6 +2664,7 @@ class AvisoForm(QWidget):
         self.lbl_tipo_traslado = QLabel("TIPO TRASLADO:")
         self.grid.addWidget(self.lbl_tipo_traslado, 10, 2, alignment=Qt.AlignmentFlag.AlignRight)
         self.tipo_traslado_cb = QComboBox()
+        self.tipo_traslado_cb.setView(QListView())  # Forzar estilo consistente del popup
         self.tipo_traslado_cb.addItems(["Ambulancias Andalucia", "Ambulancias AGP", "Helicopteros Sanitarios", "Medios Propios"])
         self.tipo_traslado_cb.setEnabled(False)
         self.tipo_traslado_cb.currentTextChanged.connect(self.toggle_ambulancia)
@@ -2611,6 +2682,7 @@ class AvisoForm(QWidget):
         # --- Row 11: Ingreso ---
         self.grid.addWidget(QLabel("INGRESO:"), 11, 0, alignment=Qt.AlignmentFlag.AlignRight)
         self.ingreso_cb = QComboBox()
+        self.ingreso_cb.setView(QListView())  # Forzar estilo consistente del popup
         self.ingreso_cb.addItems(["No ingresa", "Planta", "UCI"])
         self.grid.addWidget(self.ingreso_cb, 11, 1)
 
