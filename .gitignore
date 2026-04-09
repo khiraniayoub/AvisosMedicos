@@ -35,3 +35,7 @@ Thumbs.db
 Ejecutables_Para_Clientes/
 *.dll
 *.pak
+
+INFORME_PROYECTO_SEGURIDAD.pdf
+*.md
+generar_informe_pdf.py

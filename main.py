@@ -15,7 +15,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
                              QSpinBox, QTextEdit, QCheckBox, QPushButton, QLabel, 
                              QScrollArea, QMessageBox, QTabWidget, QTableWidget, 
                              QTableWidgetItem, QHeaderView, QFrame, QMenu, QGridLayout,
-                             QFileDialog, QGraphicsDropShadowEffect, QDialog, QListWidget, QListView)
+                             QFileDialog, QGraphicsDropShadowEffect, QDialog, QListWidget, QListWidgetItem, QListView)
 
 import webbrowser
 from urllib.parse import quote
@@ -68,6 +68,15 @@ class ClickableLabel(QLabel):
     def mousePressEvent(self, event):
         self.clicked.emit()
         super().mousePressEvent(event)
+
+
+class DownwardComboBox(QComboBox):
+    """QComboBox que abre el popup por debajo del campo."""
+
+    def showPopup(self):
+        super().showPopup()
+        popup = self.view().window()
+        popup.move(self.mapToGlobal(QPoint(0, self.height())))
 
 def get_vithas_stylesheet():
     return """
@@ -2240,14 +2249,22 @@ class AvisoForm(QWidget):
         self.anim.setLoopCount(-1) # Infinite loop
         self.anim.start()
 
+        self.refresh_teams_destinations()
         self.reset_form()
 
-    def refresh_teams_destinations(self):
+    def refresh_teams_destinations(self, selected_name=None):
         from src.teams_config import TeamsConfigManager
+        previous_name = self.teams_dest_cb.currentText()
         self.teams_dest_cb.clear()
         dests = TeamsConfigManager.get_destinations()
         for d in dests:
             self.teams_dest_cb.addItem(d["name"], d["url"])
+        # Keep current selection when possible, or select an explicitly requested destination.
+        target_name = selected_name or previous_name
+        if target_name:
+            idx = self.teams_dest_cb.findText(target_name)
+            if idx >= 0:
+                self.teams_dest_cb.setCurrentIndex(idx)
             
     def manage_teams_config(self):
         from src.teams_config import TeamsConfigManager
@@ -2261,7 +2278,9 @@ class AvisoForm(QWidget):
         list_widget = QListWidget()
         dests = TeamsConfigManager.get_destinations()
         for d in dests:
-            list_widget.addItem(f"{d['name']} - {d['url'][:30]}...")
+            item = QListWidgetItem(f"{d['name']} - {d['url'][:30]}...")
+            item.setData(Qt.ItemDataRole.UserRole, d["name"])
+            list_widget.addItem(item)
             
         layout.addWidget(QLabel("Destinatarios Configurados:"))
         layout.addWidget(list_widget)
@@ -2281,10 +2300,12 @@ class AvisoForm(QWidget):
                 return
             success, msg = TeamsConfigManager.add_destination(n, u)
             if success:
-                list_widget.addItem(f"{n} - {u[:30]}...")
+                item = QListWidgetItem(f"{n} - {u[:30]}...")
+                item.setData(Qt.ItemDataRole.UserRole, n)
+                list_widget.addItem(item)
                 name_ed.clear()
                 url_ed.clear()
-                self.refresh_teams_destinations()
+                self.refresh_teams_destinations(selected_name=n)
             else:
                 QMessageBox.warning(dlg, "Error", msg)
 
@@ -2306,6 +2327,21 @@ class AvisoForm(QWidget):
         
         del_btn.clicked.connect(del_dest)
         layout.addWidget(del_btn)
+
+        use_btn = QPushButton("Usar seleccionado para enviar")
+        def use_selected_dest():
+            item = list_widget.currentItem()
+            if not item:
+                QMessageBox.warning(dlg, "Selecciona destino", "Selecciona un destinatario de la lista.")
+                return
+            selected_name = item.data(Qt.ItemDataRole.UserRole) or item.text().split(" - ", 1)[0].strip()
+            self.refresh_teams_destinations(selected_name=selected_name)
+            dlg.accept()
+        use_btn.clicked.connect(use_selected_dest)
+        layout.addWidget(use_btn)
+
+        # Double click also selects destination for sending.
+        list_widget.itemDoubleClicked.connect(lambda _: use_selected_dest())
         
         dlg.exec()
 
@@ -2325,9 +2361,9 @@ class AvisoForm(QWidget):
         self.grid.addWidget(self.fecha_edit, 1, 1)
 
         self.grid.addWidget(QLabel("EMISOR:"), 1, 4, alignment=Qt.AlignmentFlag.AlignRight)
-        self.emisor_cb = QComboBox()
+        self.emisor_cb = DownwardComboBox()
         self.emisor_cb.setView(QListView())  # Forzar estilo personalizable
-        self.emisor_cb.addItems(["Jaime", "Guia", "Paciente", "Seguro", "SMCS", "VITHAS", "RECEPCION", "GP"])
+        self.emisor_cb.addItems(["RECEPCIÓN", "GUIA", "PACIENTE", "SEGURO", "SMCS", "VITHAS", "JAIME", "GP"])
         self.emisor_cb.currentTextChanged.connect(self.on_emisor_changed)
         self.emisor_cb.setMaximumWidth(150)
         self.grid.addWidget(self.emisor_cb, 1, 5)

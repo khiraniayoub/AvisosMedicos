@@ -154,5 +154,93 @@
   "HOTEL SUNSET BEACH": {
     "lat": 36.5825329,
     "lon": -4.5350456
+  },
+  "B": {
+    "lat": 36.4893507,
+    "lon": -4.7436045
+  },
+  "BE": {
+    "lat": 36.72402,
+    "lon": -4.7162868
+  },
+  "BEST": {
+    "lat": 36.5962507,
+    "lon": -4.5209517
+  },
+  "h": {
+    "lat": 36.4905521,
+    "lon": -4.7428899
+  },
+  "h10 Croma Málaga": {
+    "lat": 36.718015,
+    "lon": -4.4253077
+  },
+  "hoTEL BEST BENALMADENA": {
+    "lat": 36.5820997,
+    "lon": -4.5367871
+  },
+  "hot": {
+    "lat": 36.4912388,
+    "lon": -4.9480779
+  },
+  "hotEL BEST BENALMADENA": {
+    "lat": 36.5820997,
+    "lon": -4.5367871
+  },
+  "hoteL BEST BENALMADENA": {
+    "lat": 36.5820997,
+    "lon": -4.5367871
+  },
+  "hotel BEST BENALMADENA": {
+    "lat": 36.5820997,
+    "lon": -4.5367871
+  },
+  "hotel b": {
+    "lat": 36.7158998,
+    "lon": -4.4234994
+  },
+  "hotel bEST BENALMADENA": {
+    "lat": 36.5820997,
+    "lon": -4.5367871
+  },
+  "hotel beST BENALMADENA": {
+    "lat": 36.5820997,
+    "lon": -4.5367871
+  },
+  "hotel beST": {
+    "lat": 36.5962507,
+    "lon": -4.5209517
+  },
+  "HOTEL BEST BENALMADENA": {
+    "lat": 36.5820997,
+    "lon": -4.5367871
+  },
+  "hotel besT BENALMADENA": {
+    "lat": 36.5820997,
+    "lon": -4.5367871
+  },
+  "hotel best": {
+    "lat": 36.5962507,
+    "lon": -4.5209517
+  },
+  "hotel best BENALMADENA": {
+    "lat": 36.5820997,
+    "lon": -4.5367871
+  },
+  "hotel best tRITON": {
+    "lat": 36.5965582,
+    "lon": -4.5184739
+  },
+  "hotel best trITON": {
+    "lat": 36.5965582,
+    "lon": -4.5184739
+  },
+  "hotel best triTON": {
+    "lat": 36.5965582,
+    "lon": -4.5184739
+  },
+  "HOTEL BEST TRITON": {
+    "lat": 36.5965582,
+    "lon": -4.5184739
   }
 }
