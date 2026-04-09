@@ -1359,24 +1359,24 @@ def create_schematic_html(data: dict) -> str:
     ingreso = (data.get("Ingreso", "No ingresa") or "No ingresa")
     medico_ingreso = data.get("Medico Ingreso", "-")
 
-    # Colors
-    estado_color = "#00cc66" if estado.lower() == "cerrado" else ("#ff4444" if estado.lower() == "abierto" else "#cccccc")
-    traslado_color = "#ffcc00" if traslado.lower() in ("si", "sí", "yes", "true") else "#555555"
+    # Softer, more readable status colors
+    estado_color = "#4aa67a" if estado.lower() == "cerrado" else ("#c06a6a" if estado.lower() == "abierto" else "#7f8794")
+    traslado_color = "#b9923d" if traslado.lower() in ("si", "sí", "yes", "true") else "#6b7280"
     
     # Determine ingreso color based on type
     if "uci" in str(ingreso).lower():
-        ingreso_color = "#ff4444"  # Red for UCI
+        ingreso_color = "#b96b6b"  # Soft red for UCI
     elif "planta" in str(ingreso).lower():
-        ingreso_color = "#ff9900"  # Orange for Planta
+        ingreso_color = "#b9874e"  # Soft amber for Planta
     else:
-        ingreso_color = "#555555"  # Gray for No ingresa
+        ingreso_color = "#6b7280"  # Soft gray for No ingresa
 
     html = [
         "<div style='font-family:Segoe UI, Roboto, sans-serif; font-size:14px; color:#e6e6e6;'>",
         # Header row with fecha/emisor/estado
         "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'>",
         f"<div style='font-weight:700;font-size:18px'>{format_date_for_display(fecha)} — {emisor}</div>",
-        f"<div style='background:{estado_color};color:#000;padding:6px 10px;border-radius:8px;font-weight:700'>{estado}</div>",
+        f"<div style='background:{estado_color};color:#f5f7fa;padding:6px 10px;border-radius:8px;font-weight:700'>{estado}</div>",
         "</div>",
 
         # Main facts grid (two columns)
@@ -1389,7 +1389,7 @@ def create_schematic_html(data: dict) -> str:
 
         # Traslado section
         "<div style='margin-top:12px;padding:10px;background:#0d0d0d;border-radius:8px'>",
-        f"<div style='display:inline-block;background:{traslado_color};color:#000;padding:6px 12px;border-radius:6px;font-weight:700;margin-right:10px'>Traslado: {traslado}</div>",
+        f"<div style='display:inline-block;background:{traslado_color};color:#f5f7fa;padding:6px 12px;border-radius:6px;font-weight:700;margin-right:10px'>Traslado: {traslado}</div>",
     ]
     
     # Add traslado details if applicable
@@ -1403,7 +1403,7 @@ def create_schematic_html(data: dict) -> str:
     # Ingreso section
     html.extend([
         "<div style='margin-top:10px;padding:10px;background:#0d0d0d;border-radius:8px'>",
-        f"<div style='display:inline-block;background:{ingreso_color};color:#000;padding:6px 12px;border-radius:6px;font-weight:700;margin-right:10px'>Ingreso: {ingreso}</div>",
+        f"<div style='display:inline-block;background:{ingreso_color};color:#f5f7fa;padding:6px 12px;border-radius:6px;font-weight:700;margin-right:10px'>Ingreso: {ingreso}</div>",
     ])
     
     # Add ingreso details if applicable
@@ -2301,6 +2301,15 @@ class AvisoForm(QWidget):
                 background-color: #000000;
                 color: #ffffff;
                 margin: 0;
+                padding: 2px 6px;
+            }
+            QListView::item:hover, QAbstractItemView::item:hover {
+                background-color: #1f5fbf;
+                color: #ffffff;
+            }
+            QListView::item:selected, QAbstractItemView::item:selected {
+                background-color: #35538f;
+                color: #ffffff;
             }
         """)
         popup_window = view.window()

@@ -243,6 +243,7 @@
     "lat": 36.5965582,
     "lon": -4.5184739
   },
+<<<<<<< HEAD
   "Hotel Angela": {
     "lat": 36.5493889,
     "lon": -4.6158786
@@ -250,5 +251,14 @@
   "Hotel Yaramar": {
     "lat": 36.5511493,
     "lon": -4.6146438
+=======
+  "Travelodge Málaga Airport": {
+    "lat": 36.6825469,
+    "lon": -4.4687805
+  },
+  "Leonardo Hotel Fuengirola": {
+    "lat": 36.5440108,
+    "lon": -4.6192065
+>>>>>>> 3c52a38 (mejoras)
   }
 }
