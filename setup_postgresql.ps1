@@ -96,8 +96,6 @@ DB_NAME=avisos_db
 DB_USER=postgres
 DB_PASSWORD=$passwordPlain
 
-# Telegram Bot Configuration (opcional)
-TELEGRAM_BOT_TOKEN=TU_TOKEN_AQUI
 "@
 
 $envContent | Out-File -FilePath ".env" -Encoding UTF8

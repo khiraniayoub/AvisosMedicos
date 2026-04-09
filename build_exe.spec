@@ -33,7 +33,6 @@ a = Analysis(
         'requests',
         'psycopg2',
         'src.database',
-        'src.telegram_bot',
         'src.whatsapp_sender',
     ],
     hookspath=[],

@@ -285,15 +285,6 @@ def get_neon_stylesheet():
         color: #ffffff;
     }
 
-    QPushButton#TelegramBtn {
-        border: 1px solid #2AABEE;
-        color: #2AABEE;
-    }
-    QPushButton#TelegramBtn:hover {
-        background-color: #2AABEE;
-        color: white;
-    }
-
     QTableWidget {
         background-color: #101a2c;
         gridline-color: #263651;
@@ -1664,15 +1655,15 @@ class AvisoManager:
 
 class MedicoManager:
     FILE_NAME = "medicos.csv"
-    FIELDS = ["Nombre", "Telefono", "telegram_chat_id"]
+    FIELDS = ["Nombre", "Telefono"]
 
     @classmethod
     def load_medicos(cls):
         if not os.path.isfile(cls.FILE_NAME):
             # Create default if not exists
             default_data = [
-                {"Nombre": "Dr. Juan Pérez", "Telefono": "34600000001", "telegram_chat_id": ""},
-                {"Nombre": "Dra. Ana Martínez", "Telefono": "34600000002", "telegram_chat_id": ""},
+                {"Nombre": "Dr. Juan Pérez", "Telefono": "34600000001"},
+                {"Nombre": "Dra. Ana Martínez", "Telefono": "34600000002"},
             ]
             cls.save_all(default_data)
             return default_data
@@ -1698,9 +1689,9 @@ class MedicoManager:
             return False, str(e)
 
     @classmethod
-    def add_medico(cls, nombre, telefono, telegram_chat_id=""):
+    def add_medico(cls, nombre, telefono):
         medicos = cls.load_medicos()
-        medicos.append({"Nombre": nombre, "Telefono": telefono, "telegram_chat_id": telegram_chat_id})
+        medicos.append({"Nombre": nombre, "Telefono": telefono})
         return cls.save_all(medicos)
 
     @classmethod
@@ -1719,15 +1710,6 @@ class MedicoManager:
                 return m.get("Telefono", "")
         return ""
 
-    @classmethod
-    def get_telegram_id(cls, nombre):
-        """Obtiene el telegram_chat_id de un médico por su nombre."""
-        medicos = cls.load_medicos()
-        for m in medicos:
-            if m["Nombre"] == nombre:
-                return m.get("telegram_chat_id", "")
-        return ""
-
 class MedicosTab(QWidget):
     def __init__(self):
         super().__init__()
@@ -1735,8 +1717,8 @@ class MedicosTab(QWidget):
         
         # Left: List
         self.table = QTableWidget()
-        self.table.setColumnCount(3)
-        self.table.setHorizontalHeaderLabels(["Nombre del Médico", "Teléfono (+34...)", "Telegram Chat ID"])
+        self.table.setColumnCount(2)
+        self.table.setHorizontalHeaderLabels(["Nombre del Médico", "Teléfono (+34...)"])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         layout.addWidget(self.table)
@@ -1753,22 +1735,6 @@ class MedicosTab(QWidget):
         self.phone_edit.setPlaceholderText("34600123456")
         ctrl_layout.addWidget(QLabel("TELÉFONO:"))
         ctrl_layout.addWidget(self.phone_edit)
-        
-        # Telegram Chat ID field with help button
-        telegram_label_layout = QHBoxLayout()
-        telegram_label = QLabel("📱 TELEGRAM CHAT ID:")
-        self.telegram_help_btn = QPushButton("❓")
-        self.telegram_help_btn.setMaximumWidth(30)
-        self.telegram_help_btn.setToolTip("Cómo obtener tu Chat ID")
-        self.telegram_help_btn.clicked.connect(self.show_telegram_help)
-        telegram_label_layout.addWidget(telegram_label)
-        telegram_label_layout.addWidget(self.telegram_help_btn)
-        telegram_label_layout.addStretch()
-        ctrl_layout.addLayout(telegram_label_layout)
-        
-        self.telegram_edit = QLineEdit()
-        self.telegram_edit.setPlaceholderText("Ej: 123456789 (opcional)")
-        ctrl_layout.addWidget(self.telegram_edit)
         
         self.add_btn = QPushButton("AÑADIR MÉDICO")
         self.add_btn.clicked.connect(self.add_medico)
@@ -1791,34 +1757,19 @@ class MedicosTab(QWidget):
         for i, m in enumerate(medicos):
             self.table.setItem(i, 0, QTableWidgetItem(m.get("Nombre", "")))
             self.table.setItem(i, 1, QTableWidgetItem(m.get("Telefono", "")))
-            self.table.setItem(i, 2, QTableWidgetItem(m.get("telegram_chat_id", "")))
 
     def add_medico(self):
         name = self.name_edit.text().strip()
         phone = self.phone_edit.text().strip()
-        telegram_id = self.telegram_edit.text().strip()
         
         if not name:
             QMessageBox.warning(self, "Error", "El nombre es obligatorio")
             return
         
-        MedicoManager.add_medico(name, phone, telegram_id)
+        MedicoManager.add_medico(name, phone)
         self.name_edit.clear()
         self.phone_edit.clear()
-        self.telegram_edit.clear()
         self.load_data()
-    
-    def show_telegram_help(self):
-        """Muestra instrucciones para obtener el Chat ID de Telegram."""
-        from src.integrations.telegram_bot import get_chat_id_instructions
-        
-        help_text = get_chat_id_instructions()
-        
-        msg = QMessageBox(self)
-        msg.setWindowTitle("📱 Cómo obtener tu Chat ID de Telegram")
-        msg.setText(help_text)
-        msg.setIcon(QMessageBox.Icon.Information)
-        msg.exec()
 
     def delete_medico(self):
         row = self.table.currentRow()
