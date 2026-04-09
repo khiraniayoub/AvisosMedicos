@@ -116,7 +116,7 @@ Instala: https://aka.ms/vs/17/release/vc_redist.x64.exe
 ✅ Mapas interactivos (Folium)  
 ✅ Conexión PostgreSQL (opcional)  
 ✅ Exportación Excel/CSV  
-✅ Integración Teams/Telegram/WhatsApp  
+✅ Integración Teams/WhatsApp
 ✅ Todos los recursos visuales  
 
 ---

@@ -24,7 +24,7 @@ ENV/
 *.bak
 .qodo/
 
-# Telegram Bot Configuration - IMPORTANT!
+# Environment configuration
 .env
 *.env
 
