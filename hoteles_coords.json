@@ -242,5 +242,13 @@
   "HOTEL BEST TRITON": {
     "lat": 36.5965582,
     "lon": -4.5184739
+  },
+  "Hotel Angela": {
+    "lat": 36.5493889,
+    "lon": -4.6158786
+  },
+  "Hotel Yaramar": {
+    "lat": 36.5511493,
+    "lon": -4.6146438
   }
 }
