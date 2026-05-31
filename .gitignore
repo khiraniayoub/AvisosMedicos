@@ -31,11 +31,34 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
 # Mis carpetas de ejecutables pesados
 Ejecutables_Para_Clientes/
 *.dll
 *.pak
 
+# Datos de prueba y exportaciones
+*.csv
+*.xlsx
+*.ods
+test_export.xlsx
+busqueda_avisos_*.ods
+
+# Configuración sensible y archivos de login
+*.json
+.remember_login.json
+teams_config.json
+
+# Reportes y logs
+*.txt
+reporte_bd.txt
+
+# Screenshots y archivos temporales
+*.png
+config_gear.png
+vithas_bg.png
+
+# Documentación generada
 INFORME_PROYECTO_SEGURIDAD.pdf
 *.md
 generar_informe_pdf.py
