@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="logo.png" alt="Vithas Medical Manager" width="280"/>
-</p>
+
 
 <h1 align="center">🏥 Vithas Medical Manager</h1>
 
@@ -249,5 +247,4 @@ DB_PASSWORD=contraseña
 
 ## 📄 Licencia
 
-Este proyecto es de **uso privado** y fue desarrollado para el Hospital Vithas Xanit Internacional.
-Todos los derechos reservados.
+Este proyecto es de **uso privado**.
