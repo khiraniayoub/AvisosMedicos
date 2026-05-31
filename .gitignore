@@ -20,22 +20,59 @@ ENV/
 *.swo
 *~
 
-# Project specific
-*.bak
-.qodo/
-
-# Environment configuration
-.env
-*.env
-
 # OS
 .DS_Store
 Thumbs.db
-# Mis carpetas de ejecutables pesados
+
+# ─── Sensitive & Data Files ───
+# Credentials and login
+.remember_login.json
+.env
+*.env
+env_para_clientes.txt
+
+# Webhooks and config with secrets
+teams_config.json
+
+# Data files (patient/medical data)
+avisos.csv
+medicos.csv
+hoteles.csv
+hoteles_coords.json
+
+# Exported files and spreadsheets
+*.xlsx
+*.ods
+*.bak
+
+# ─── Build & Distribution ───
 Ejecutables_Para_Clientes/
 *.dll
 *.pak
+*.spec
+*.bat
+configurar_multiusuario.ps1
+setup_postgresql.ps1
 
+# ─── Generated files ───
 INFORME_PROYECTO_SEGURIDAD.pdf
-*.md
+INFORME_PROYECTO_SEGURIDAD.md
 generar_informe_pdf.py
+reporte_bd.txt
+
+# ─── Documentation (exclude internal docs, keep README) ───
+CONFIGURACION_COMPLETADA.md
+DOCUMENTACION_APP.md
+EJECUTABLE_LISTO.md
+EJECUTABLE_YA_FUNCIONA.md
+ESTADO_BASE_DATOS.md
+GUIA_CONFIGURACION_PASO_A_PASO.md
+INICIO_RAPIDO_MULTIUSUARIO.md
+INSTALACION_POSTGRESQL.md
+MULTI_USUARIO_GUIA.md
+README_EJECUTABLE.md
+TEAMS_GUIDE.md
+
+# ─── Other ───
+.qodo/
+

@@ -20,6 +20,14 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
 import webbrowser
 from urllib.parse import quote
 import math
+import tempfile
+
+
+def _app_base_dir() -> Path:
+    """Carpeta del ejecutable o del script: ahí deben estar los CSV junto a la app."""
+    if getattr(sys, "frozen", False) and getattr(sys, "executable", None):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parent
 
 # Matplotlib for charts
 import matplotlib
@@ -1680,7 +1688,7 @@ class AvisoManager:
 
 
 class MedicoManager:
-    FILE_NAME = "medicos.csv"
+    FILE_NAME = str(_app_base_dir() / "medicos.csv")
     FIELDS = ["Nombre", "Telefono"]
 
     @classmethod
@@ -1697,19 +1705,46 @@ class MedicoManager:
         try:
             with open(cls.FILE_NAME, mode="r", encoding="utf-8") as file:
                 reader = csv.DictReader(file)
-                return list(reader)
+                rows = list(reader)
+                # Normalizar claves por si el CSV tiene columnas extra o variaciones
+                return [
+                    {
+                        "Nombre": str(m.get("Nombre", "") or "").strip(),
+                        "Telefono": str(m.get("Telefono", "") or "").strip(),
+                    }
+                    for m in rows
+                ]
         except Exception as e:
             print(f"Error loading Medicos: {e}")
             return []
 
     @classmethod
     def save_all(cls, medicos_list):
+        path = Path(cls.FILE_NAME)
         try:
-            with open(cls.FILE_NAME, mode="w", newline="", encoding="utf-8") as file:
-                writer = csv.DictWriter(file, fieldnames=cls.FIELDS)
-                writer.writeheader()
-                for m in medicos_list:
-                    writer.writerow(m)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            fd, tmp_path = tempfile.mkstemp(
+                suffix=".csv.tmp", dir=str(path.parent), text=True
+            )
+            os.close(fd)
+            try:
+                with open(tmp_path, mode="w", newline="", encoding="utf-8") as file:
+                    writer = csv.DictWriter(file, fieldnames=cls.FIELDS)
+                    writer.writeheader()
+                    for m in medicos_list:
+                        row = {
+                            k: str(m.get(k, "") or "").strip()
+                            for k in cls.FIELDS
+                        }
+                        writer.writerow(row)
+                os.replace(tmp_path, path)
+            except Exception:
+                if os.path.isfile(tmp_path):
+                    try:
+                        os.remove(tmp_path)
+                    except OSError:
+                        pass
+                raise
             return True, "Guardado."
         except Exception as e:
             return False, str(e)
@@ -1792,7 +1827,14 @@ class MedicosTab(QWidget):
             QMessageBox.warning(self, "Error", "El nombre es obligatorio")
             return
         
-        MedicoManager.add_medico(name, phone)
+        ok, msg = MedicoManager.add_medico(name, phone)
+        if not ok:
+            QMessageBox.critical(
+                self,
+                "Error al guardar",
+                f"No se pudo guardar medicos.csv (la lista no se actualizó):\n{msg}",
+            )
+            return
         self.name_edit.clear()
         self.phone_edit.clear()
         self.load_data()
@@ -1806,7 +1848,10 @@ class MedicosTab(QWidget):
         confirm = QMessageBox.question(self, "Confirmar", f"¿Eliminar a {name}?", 
                                      QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if confirm == QMessageBox.StandardButton.Yes:
-            MedicoManager.delete_medico(row)
+            ok, msg = MedicoManager.delete_medico(row)
+            if not ok:
+                QMessageBox.critical(self, "Error al guardar", msg)
+                return
             self.load_data()
 
 

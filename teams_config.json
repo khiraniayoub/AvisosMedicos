@@ -1,8 +1,0 @@
-{
-  "destinations": [
-    {
-      "name": "yo",
-      "url": "https://defaulte4f11f0114dc4099b8cfc1fab2e970.1f.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8632fd868b1c4bf7bebb9e72fb3fbd1c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=rFJMJrHBhmec71Fd4aS0niRoUsglYEKZJ9WHDFONU_8"
-    }
-  ]
-}
